@@ -60,6 +60,10 @@ df = to_pandas(rows)
 - Flat endpoints return `list[dict]` (the API's own field keys, untouched).
 - Grouped endpoints (securities registration; some reports) return
   `dict[str, list[dict]]`, keyed by each group's title.
+- Zip endpoints return raw `bytes`: `disclosure.document(rcept_no)` and
+  `finance.xbrl_document(rcept_no, report_code=...)` hand back the archive for the
+  caller to unzip. `corp_codes()` is the exception — it parses its zip into
+  `list[dict]` for you.
 - `status 013` (no data) is an expected empty (`[]` / `{}`), never an error.
 - Other error statuses raise a typed `DartError` subclass (`AuthError`,
   `RateLimitError`, `ValidationError`, `ServerError`) carrying the status and the

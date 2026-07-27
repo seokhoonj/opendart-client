@@ -22,9 +22,9 @@ _JAMO_PER_CHOSEONG = 588   # 21 jungseong x 28 jongseong
 Row = dict[str, Any]
 
 
-def chosung(text: str) -> str:
+def choseong(text: str) -> str:
     """The 초성 (leading consonants) of a Korean string; non-Hangul chars are dropped.
-    ``chosung("삼성전자") == "ㅅㅅㅈㅈ"``."""
+    ``choseong("삼성전자") == "ㅅㅅㅈㅈ"``."""
     out: list[str] = []
     for char in text:
         code = ord(char)
@@ -44,15 +44,15 @@ class CorpResolver:
 
     def __init__(self, rows: list[Row]) -> None:
         self._rows = [r for r in rows if r.get("corp_code")]
-        self._by_corp_code: dict[str, Row] = {r["corp_code"]: r for r in self._rows}
-        self._by_stock_code: dict[str, Row] = {
+        self._row_by_corp_code: dict[str, Row] = {r["corp_code"]: r for r in self._rows}
+        self._row_by_stock_code: dict[str, Row] = {
             r["stock_code"]: r for r in self._rows if r.get("stock_code")
         }
-        self._by_name: dict[str, list[Row]] = {}
+        self._rows_by_name: dict[str, list[Row]] = {}
         for r in self._rows:
-            self._by_name.setdefault(r.get("corp_name", ""), []).append(r)
-        self._name_chosung: dict[str, str] = {
-            r["corp_code"]: chosung(r.get("corp_name", "")) for r in self._rows
+            self._rows_by_name.setdefault(r.get("corp_name", ""), []).append(r)
+        self._choseong_by_corp_code: dict[str, str] = {
+            r["corp_code"]: choseong(r.get("corp_name", "")) for r in self._rows
         }
 
     def search(self, query: str, *, limit: int = 10) -> list[Row]:
@@ -61,22 +61,24 @@ class CorpResolver:
         q = query.strip()
         if not q:
             return []
-        if q in self._by_stock_code:
-            return [self._by_stock_code[q]]
-        if q in self._by_corp_code:
-            return [self._by_corp_code[q]]
+        if q in self._row_by_stock_code:
+            return [self._row_by_stock_code[q]]
+        if q in self._row_by_corp_code:
+            return [self._row_by_corp_code[q]]
         if all(char in _CHOSEONG for char in q):          # a 초성 query like "ㅅㅅㅈㅈ"
-            hits = [r for r in self._rows if self._name_chosung[r["corp_code"]].startswith(q)]
+            hits = [r for r in self._rows
+                    if self._choseong_by_corp_code[r["corp_code"]].startswith(q)]
         else:
-            exact = self._by_name.get(q, [])
+            exact = self._rows_by_name.get(q, [])
             starts = [r for r in self._rows
                       if r["corp_name"].startswith(q) and r["corp_name"] != q]
             contains = [r for r in self._rows
                         if q in r["corp_name"] and not r["corp_name"].startswith(q)]
             hits = [*exact, *starts, *contains]
             if not hits:                                   # typo-tolerant fallback
-                for name in difflib.get_close_matches(q, list(self._by_name), n=limit, cutoff=0.6):
-                    hits.extend(self._by_name[name])
+                names = difflib.get_close_matches(q, list(self._rows_by_name), n=limit, cutoff=0.6)
+                for name in names:
+                    hits.extend(self._rows_by_name[name])
         seen: set[str] = set()
         unique: list[Row] = []
         for r in hits:
@@ -91,11 +93,11 @@ class CorpResolver:
         resolves a 6-digit ticker directly. Raises ``ValueError`` if nothing matches, or
         if a name is exactly shared by several companies (use ``search`` to disambiguate)."""
         q = query.strip()
-        if q in self._by_corp_code:
+        if q in self._row_by_corp_code:
             return q
-        if q in self._by_stock_code:
-            return str(self._by_stock_code[q]["corp_code"])
-        exact = self._by_name.get(q)
+        if q in self._row_by_stock_code:
+            return str(self._row_by_stock_code[q]["corp_code"])
+        exact = self._rows_by_name.get(q)
         if exact:
             if len(exact) > 1:
                 codes = [r["corp_code"] for r in exact]

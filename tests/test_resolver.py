@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from opendartclient.resolver import CorpResolver, chosung
+from opendartclient.resolver import CorpResolver, choseong
 
 
 def _row(corp_code: str, name: str, stock: str | None) -> dict[str, Any]:
@@ -25,10 +25,10 @@ def resolver() -> CorpResolver:
     return CorpResolver(_ROWS)
 
 
-def test_chosung_extracts_leading_consonants():
-    assert chosung("삼성전자") == "ㅅㅅㅈㅈ"
-    assert chosung("SK하이닉스") == "ㅎㅇㄴㅅ"     # latin dropped; 하이닉스 only
-    assert chosung("") == ""
+def test_choseong_extracts_leading_consonants():
+    assert choseong("삼성전자") == "ㅅㅅㅈㅈ"
+    assert choseong("SK하이닉스") == "ㅎㅇㄴㅅ"     # latin dropped; 하이닉스 only
+    assert choseong("") == ""
 
 
 def test_resolve_passes_through_a_corp_code(resolver):
@@ -43,7 +43,7 @@ def test_resolve_an_exact_name(resolver):
     assert resolver.resolve("삼성전자") == "00126380"
 
 
-def test_resolve_a_chosung_query_prefers_the_listed_shorter_match(resolver):
+def test_resolve_a_choseong_query_prefers_the_listed_shorter_match(resolver):
     # "ㅅㅅㅈㅈ" matches both 삼성전자 (listed) and 삼성전자서비스 (unlisted, longer);
     # listed-and-shorter wins.
     assert resolver.resolve("ㅅㅅㅈㅈ") == "00126380"
@@ -66,7 +66,7 @@ def test_search_returns_ranked_candidates(resolver):
     assert names.index("삼성전자") < names.index("삼성전자서비스")
 
 
-def test_search_by_chosung(resolver):
+def test_search_by_choseong(resolver):
     hits = resolver.search("ㅅㅅ")
     assert {r["corp_code"] for r in hits} >= {"00126380", "00126362", "00999999"}
 
@@ -75,3 +75,20 @@ def test_resolve_ambiguous_exact_name_raises():
     rows = [_row("A", "동명", "111111"), _row("B", "동명", "222222")]
     with pytest.raises(ValueError, match="matches 2 companies"):
         CorpResolver(rows).resolve("동명")
+
+
+def test_search_empty_or_whitespace_returns_empty(resolver):
+    assert resolver.search("") == []
+    assert resolver.search("   ") == []
+
+
+def test_resolve_all_choseong_no_match_raises(resolver):
+    # a well-formed 초성 query that matches nothing raises, not returns garbage
+    with pytest.raises(ValueError, match="no company matches"):
+        resolver.resolve("ㅋㅋㅋㅋㅋ")
+
+
+def test_search_multi_substring_ranks_deterministically(resolver):
+    # "삼성" is inside three names; listed-before-unlisted then shorter-name is stable.
+    names = [r["corp_name"] for r in resolver.search("삼성")]
+    assert names == ["삼성전자", "삼성물산", "삼성전자서비스"]
