@@ -61,7 +61,7 @@ EQUITY_INVESTMENTS = _make_endpoint("otrCprInvstmntSttus", "2019015")
 
 
 class Report:
-    """정기보고서 주요정보 (DS002). Reach it as ``DartClient.report``.
+    """정기보고서 주요정보 (DS002). Reach it as ``OpenDart.report``.
 
     Every method takes ``corp_code`` + ``fiscal_year`` + ``report_code`` (사업/반기/
     1분기/3분기, default 사업보고서) and returns the matching rows.

@@ -5,11 +5,11 @@ import json
 
 import pytest
 
-from opendartkit import DartClient
+from opendartclient import OpenDart
 
 
-def _client(body: dict, *, capture: dict | None = None) -> DartClient:
-    client = DartClient(api_key="TESTKEY")
+def _client(body: dict, *, capture: dict | None = None) -> OpenDart:
+    client = OpenDart(api_key="TESTKEY")
 
     def _fake_get(endpoint, params):
         if capture is not None:
@@ -23,7 +23,7 @@ def _client(body: dict, *, capture: dict | None = None) -> DartClient:
 
 
 def test_client_wires_all_six_sub_surfaces():
-    client = DartClient(api_key="TESTKEY")
+    client = OpenDart(api_key="TESTKEY")
     for surface in ("disclosure", "report", "finance", "ownership", "event", "registration"):
         assert hasattr(client, surface)
 
@@ -80,7 +80,7 @@ def test_ownership_five_percent_holdings():
 
 
 def test_missing_required_param_raises_before_call():
-    client = DartClient(api_key="TESTKEY")
+    client = OpenDart(api_key="TESTKEY")
     called = {"hit": False}
 
     def _must_not_run(endpoint, params):

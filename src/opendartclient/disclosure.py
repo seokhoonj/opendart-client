@@ -22,7 +22,7 @@ DOCUMENT = DartEndpoint(
 
 
 class Disclosure:
-    """공시정보 (DS001). Reach it as ``DartClient.disclosure``."""
+    """공시정보 (DS001). Reach it as ``OpenDart.disclosure``."""
 
     def __init__(self, session: DartSession) -> None:
         self._session = session

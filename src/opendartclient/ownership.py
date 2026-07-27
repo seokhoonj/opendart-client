@@ -22,7 +22,7 @@ FIVE_PERCENT_HOLDINGS = DartEndpoint(
 
 
 class Ownership:
-    """지분공시 종합정보 (DS004). Reach it as ``DartClient.ownership``."""
+    """지분공시 종합정보 (DS004). Reach it as ``OpenDart.ownership``."""
 
     def __init__(self, session: DartSession) -> None:
         self._session = session

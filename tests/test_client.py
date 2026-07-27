@@ -5,8 +5,8 @@ import zipfile
 
 import pytest
 
-from opendartkit.client import _parse_corp_code_zip
-from opendartkit.errors import AuthError, DartError
+from opendartclient.client import _parse_corp_code_zip
+from opendartclient.errors import AuthError, DartError
 
 _XML = (
     "<result>"

@@ -1,8 +1,8 @@
-"""opendartkit -- a clean, sync, typed client for Korea's OpenDART (전자공시) API.
+"""opendartclient -- a clean, sync, typed client for Korea's OpenDART (전자공시) API.
 
-    from opendartkit import DartClient
+    from opendartclient import OpenDart
 
-    dart = DartClient(api_key="...")          # or set OPENDART_API_KEY
+    dart = OpenDart(api_key="...")          # or set OPENDART_API_KEY
     rows = dart.disclosure.search(corp_code="00126380",
                                   begin_date="20260101", end_date="20260131")
     profile = dart.disclosure.company("00126380")
@@ -17,7 +17,7 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError, version
 
 from ._endpoint import DartEndpoint
-from .client import DartClient
+from .client import OpenDart
 from .errors import (
     AuthError,
     DartError,
@@ -38,7 +38,7 @@ from .types import (
 )
 
 try:
-    __version__ = version("opendartkit")   # single source of truth: pyproject.toml
+    __version__ = version("opendartclient")   # single source of truth: pyproject.toml
 except PackageNotFoundError:               # running from source without an install
     __version__ = "0.0.0+unknown"
 
@@ -46,7 +46,7 @@ __all__ = [
     "AuthError",
     "CorpClass",
     "CorpResolver",
-    "DartClient",
+    "OpenDart",
     "DartEndpoint",
     "DartError",
     "DartSession",

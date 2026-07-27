@@ -62,7 +62,7 @@ XBRL_TAXONOMY = DartEndpoint("xbrlTaxonomy", "DS003", "2020001", required=("sj_d
 
 
 class Finance:
-    """정기보고서 재무정보 (DS003). Reach it as ``DartClient.finance``."""
+    """정기보고서 재무정보 (DS003). Reach it as ``OpenDart.finance``."""
 
     def __init__(self, session: DartSession) -> None:
         self._session = session

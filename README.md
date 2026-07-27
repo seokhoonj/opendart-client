@@ -1,4 +1,4 @@
-# opendartkit
+# OpenDartClient
 
 A clean, sync, typed Python client for Korea's **OpenDART** (금융감독원 전자공시시스템)
 disclosure API — the Korean equivalent of the SEC's EDGAR.
@@ -16,10 +16,10 @@ disclosure API — the Korean equivalent of the SEC's EDGAR.
 ## Install
 
 ```bash
-pip install opendartkit
+pip install opendartclient
 # optional frame helpers
-pip install 'opendartkit[pandas]'
-pip install 'opendartkit[polars]'
+pip install 'opendartclient[pandas]'
+pip install 'opendartclient[polars]'
 ```
 
 Get a free API key (40 chars) at <https://opendart.fss.or.kr>.
@@ -27,9 +27,9 @@ Get a free API key (40 chars) at <https://opendart.fss.or.kr>.
 ## Quickstart
 
 ```python
-from opendartkit import DartClient
+from opendartclient import OpenDart
 
-dart = DartClient(api_key="...")        # or set OPENDART_API_KEY in the environment
+dart = OpenDart(api_key="...")        # or set OPENDART_API_KEY in the environment
 
 # 1) Which disclosures were filed, and when
 rows = dart.disclosure.search(
@@ -51,7 +51,7 @@ r.resolve("ㅅㅅㅈㅈ")                     # 초성    -> "00126380"
 r.resolve("삼서전자")                     # typo    -> "00126380"
 
 # Frame it however you like (optional):
-from opendartkit import to_pandas
+from opendartclient import to_pandas
 df = to_pandas(rows)
 ```
 

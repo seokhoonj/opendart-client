@@ -1,4 +1,4 @@
-"""DartClient -- the entry point.
+"""OpenDart -- the entry point.
 
 Built from an API key (constructor or ``OPENDART_API_KEY`` env), it holds a
 ``DartSession`` and wires the grouped sub-surfaces. ``corp_codes`` lives here because
@@ -27,7 +27,7 @@ from .session import DartSession
 CORP_CODE = DartEndpoint("corpCode", "DS001", "2019018", payload_kind="zip")
 
 
-class DartClient:
+class OpenDart:
     """Client for the OpenDART REST API. Groups endpoints as sub-surfaces."""
 
     def __init__(self, api_key: str | None = None, *, timeout: float = 30.0) -> None:
@@ -41,7 +41,7 @@ class DartClient:
         self._resolver: CorpResolver | None = None
 
     def __repr__(self) -> str:
-        return f"DartClient({self._session!r})"
+        return f"OpenDart({self._session!r})"
 
     def resolver(self) -> CorpResolver:
         """A name / ticker / 초성 / typo -> corp_code resolver, built once from

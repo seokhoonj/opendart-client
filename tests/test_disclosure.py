@@ -2,8 +2,8 @@
 
 import json
 
-from opendartkit.disclosure import Disclosure
-from opendartkit.session import DartSession
+from opendartclient.disclosure import Disclosure
+from opendartclient.session import DartSession
 
 
 def _session_pages(pages: list[dict]) -> DartSession:

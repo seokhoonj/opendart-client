@@ -61,7 +61,7 @@ STOCK_EXCHANGE = _make_endpoint("stkExtrDecsn", "2020053")
 
 
 class Event:
-    """주요사항보고서 (DS005). Reach it as ``DartClient.event``.
+    """주요사항보고서 (DS005). Reach it as ``OpenDart.event``.
 
     Every method takes ``corp_code`` and a ``begin_date`` / ``end_date`` (YYYYMMDD)
     receipt-date window, and returns the matching decisions as ``list[dict]``.

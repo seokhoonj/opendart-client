@@ -31,7 +31,7 @@ DIVISION = _make_endpoint("dvRs", "2020059")
 
 
 class Registration:
-    """증권신고서 (DS006). Reach it as ``DartClient.registration``.
+    """증권신고서 (DS006). Reach it as ``OpenDart.registration``.
 
     Every method takes ``corp_code`` + ``begin_date`` / ``end_date`` (YYYYMMDD) and
     returns ``dict[str, list[dict]]`` -- the filing's titled sub-tables.

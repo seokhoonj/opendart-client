@@ -3,7 +3,7 @@
 Most OpenDART endpoints are keyed by an 8-digit ``corp_code`` that nobody remembers.
 This resolves a company **name** ("삼성전자"), a 6-digit **ticker** ("005930"), an
 8-digit **corp_code** (passed through), a **초성** query ("ㅅㅅㅈㅈ"), or a **typo**
-("삼서전자") to the corp_code -- built once from ``DartClient.corp_codes()`` and then
+("삼서전자") to the corp_code -- built once from ``OpenDart.corp_codes()`` and then
 pure/offline. Zero dependencies: ``difflib`` (stdlib) does the fuzzy matching.
 """
 

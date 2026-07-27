@@ -8,9 +8,9 @@ import zipfile
 
 import pytest
 
-from opendartkit import DartClient, DartError
-from opendartkit._endpoint import DartEndpoint
-from opendartkit.session import DartSession
+from opendartclient import DartError, OpenDart
+from opendartclient._endpoint import DartEndpoint
+from opendartclient.session import DartSession
 
 
 def _zip(names_to_xml: dict[str, str]) -> bytes:
@@ -49,7 +49,7 @@ def test_get_builds_url_with_key_params_and_honors_timeout(monkeypatch):
         return _Resp()
 
     monkeypatch.setattr("urllib.request.urlopen", _fake_urlopen)
-    from opendartkit.disclosure import SEARCH
+    from opendartclient.disclosure import SEARCH
     DartSession(api_key="TESTKEY", timeout=12.5).fetch_list(SEARCH, corp_code="00126380")
     assert "crtfc_key=TESTKEY" in captured["url"]
     assert "corp_code=00126380" in captured["url"]
@@ -61,7 +61,7 @@ def test_get_builds_url_with_key_params_and_honors_timeout(monkeypatch):
 
 @pytest.mark.parametrize("payload", [b"[]", b"null", b'"text"', b"123"])
 def test_non_object_json_body_raises_dart_error(payload):
-    from opendartkit.disclosure import SEARCH
+    from opendartclient.disclosure import SEARCH
     session = DartSession(api_key="TESTKEY")
     session._get = lambda endpoint, params: payload  # type: ignore[method-assign]
     with pytest.raises(DartError) as exc:
@@ -72,7 +72,7 @@ def test_non_object_json_body_raises_dart_error(payload):
 # --- valid empty zip --------------------------------------------------------
 
 def test_fetch_bytes_accepts_a_valid_empty_zip():
-    from opendartkit.client import CORP_CODE
+    from opendartclient.client import CORP_CODE
     session = DartSession(api_key="TESTKEY")
     empty = _empty_zip()
     session._get = lambda endpoint, params: empty  # type: ignore[method-assign]
@@ -115,8 +115,8 @@ def test_fetch_groups_survives_title_that_collides_with_the_generated_suffix():
 
 # --- bulk boundaries on BOTH bulk methods -----------------------------------
 
-def _finance_client() -> DartClient:
-    client = DartClient(api_key="TESTKEY")
+def _finance_client() -> OpenDart:
+    client = OpenDart(api_key="TESTKEY")
     client._session._get = lambda endpoint, params: b'{"status":"000","list":[]}'  # type: ignore[method-assign]
     return client
 
@@ -150,7 +150,7 @@ def test_bulk_methods_reject_a_bare_str():
 def test_corp_codes_parses_a_stubbed_zip():
     xml = ("<result><list><corp_code>00126380</corp_code><corp_name>삼성전자</corp_name>"
            "<stock_code>005930</stock_code><modify_date>20230101</modify_date></list></result>")
-    client = DartClient(api_key="TESTKEY")
+    client = OpenDart(api_key="TESTKEY")
     captured: dict = {}
 
     def _get(endpoint, params):
@@ -164,7 +164,7 @@ def test_corp_codes_parses_a_stubbed_zip():
 
 
 def test_document_and_xbrl_return_raw_zip_bytes():
-    client = DartClient(api_key="TESTKEY")
+    client = OpenDart(api_key="TESTKEY")
     payload = _zip({"doc.xml": "<x/>"})
     seen: dict = {}
 
@@ -181,8 +181,8 @@ def test_document_and_xbrl_return_raw_zip_bytes():
 
 
 def test_binary_public_path_propagates_error_xml_as_typed_error():
-    from opendartkit import AuthError
-    client = DartClient(api_key="TESTKEY")
+    from opendartclient import AuthError
+    client = OpenDart(api_key="TESTKEY")
     client._session._get = (  # type: ignore[method-assign]
         lambda endpoint, params: b"<result><status>010</status><message>bad key</message></result>"
     )
@@ -195,13 +195,13 @@ def test_binary_public_path_propagates_error_xml_as_typed_error():
 def test_company_returns_the_full_body_envelope():
     body = {"status": "000", "message": "정상", "corp_name": "삼성전자",
             "ceo_nm": "한종희", "stock_code": "005930", "est_dt": "19690113"}
-    client = DartClient(api_key="TESTKEY")
+    client = OpenDart(api_key="TESTKEY")
     client._session._get = lambda endpoint, params: json.dumps(body).encode()  # type: ignore[method-assign]
     assert client.disclosure.company("00126380") == body   # nothing stripped
 
 
 def test_search_raises_on_a_000_body_missing_list():
-    from opendartkit.disclosure import Disclosure
+    from opendartclient.disclosure import Disclosure
     session = DartSession(api_key="TESTKEY")
     session._get = lambda endpoint, params: b'{"status": "000", "total_page": 1}'  # type: ignore[method-assign]
     with pytest.raises(DartError, match="no 'list'"):

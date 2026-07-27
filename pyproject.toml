@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "opendartkit"
+name = "opendartclient"
 version = "0.1.0"
 description = "A clean, sync, typed Python client for Korea's OpenDART (전자공시) disclosure API."
 readme = "README.md"
@@ -40,11 +40,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/seokhoonj/opendartkit"
-Repository = "https://github.com/seokhoonj/opendartkit"
+Homepage = "https://github.com/seokhoonj/opendartclient"
+Repository = "https://github.com/seokhoonj/opendartclient"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/opendartkit"]
+packages = ["src/opendartclient"]
 
 [tool.ruff]
 # 100, not 88: the OpenDART endpoint constants are long domain names

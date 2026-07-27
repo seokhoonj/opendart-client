@@ -8,9 +8,9 @@ import json
 
 import pytest
 
-from opendartkit._endpoint import DartEndpoint
-from opendartkit.errors import AuthError, DartError, RateLimitError
-from opendartkit.session import DartSession
+from opendartclient._endpoint import DartEndpoint
+from opendartclient.errors import AuthError, DartError, RateLimitError
+from opendartclient.session import DartSession
 
 FLAT = DartEndpoint("list", "DS001", "2019001")
 GROUPED = DartEndpoint("estkRs", "DS006", "2020054", response_shape="grouped")
