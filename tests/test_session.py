@@ -111,10 +111,11 @@ def test_required_param_rejected_before_any_http():
     assert not called["hit"]
 
 
-def test_crtfc_key_injected_into_query():
+def test_fetch_list_passes_params_to_get():
+    # NB: this stubs _get, so it does NOT cover crtfc_key injection / URL building --
+    # that is test_edges.test_get_builds_url_with_key_params_and_honors_timeout. Here we
+    # only assert the caller-supplied params reach _get untouched.
     captured: dict = {}
     _session({"status": "000", "list": []}, capture=captured).fetch_list(
         FLAT, corp_code="00126380")
-    # the key is added inside _get, which the stub replaces, so we assert the
-    # caller-supplied params reach _get untouched (key injection is _get's job).
     assert captured["corp_code"] == "00126380"

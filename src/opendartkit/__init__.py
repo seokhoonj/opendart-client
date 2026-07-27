@@ -14,6 +14,8 @@ your own. Zero runtime dependencies.
 
 from __future__ import annotations
 
+from importlib.metadata import PackageNotFoundError, version
+
 from ._endpoint import DartEndpoint
 from .client import DartClient
 from .errors import (
@@ -34,7 +36,10 @@ from .types import (
     StatementDiv,
 )
 
-__version__ = "0.1.0"
+try:
+    __version__ = version("opendartkit")   # single source of truth: pyproject.toml
+except PackageNotFoundError:               # running from source without an install
+    __version__ = "0.0.0+unknown"
 
 __all__ = [
     "AuthError",

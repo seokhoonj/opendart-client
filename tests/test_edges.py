@@ -198,3 +198,11 @@ def test_company_returns_the_full_body_envelope():
     client = DartClient(api_key="TESTKEY")
     client._session._get = lambda endpoint, params: json.dumps(body).encode()  # type: ignore[method-assign]
     assert client.disclosure.company("00126380") == body   # nothing stripped
+
+
+def test_search_raises_on_a_000_body_missing_list():
+    from opendartkit.disclosure import Disclosure
+    session = DartSession(api_key="TESTKEY")
+    session._get = lambda endpoint, params: b'{"status": "000", "total_page": 1}'  # type: ignore[method-assign]
+    with pytest.raises(DartError, match="no 'list'"):
+        Disclosure(session).search(corp_code="00126380")

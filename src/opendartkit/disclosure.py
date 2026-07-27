@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from ._endpoint import DartEndpoint
+from .errors import DartError
 from .session import DartSession
 from .types import CorpClass, DisclosureType, SortField, SortOrder
 
@@ -80,7 +81,13 @@ class Disclosure:
         page = 1
         while True:
             body = self._session.fetch_body(SEARCH, page_no=str(page), **base)
-            rows.extend(body.get("list", []))
+            page_rows = body.get("list")
+            if page_rows is None:   # a 000 body must carry 'list'; never silently []
+                raise DartError(
+                    str(body.get("status", "?")),
+                    "search response has no 'list'", SEARCH.guide_url,
+                )
+            rows.extend(page_rows)
             total_page = int(body.get("total_page", 1) or 1)
             if page >= total_page or (max_pages is not None and page >= max_pages):
                 break
