@@ -16,6 +16,11 @@ from typing import Any
 from ._endpoint import DartEndpoint
 from .disclosure import Disclosure
 from .errors import DartError, error_for
+from .event import Event
+from .finance import Finance
+from .ownership import Ownership
+from .registration import Registration
+from .report import Report
 from .session import DartSession
 
 CORP_CODE = DartEndpoint("corpCode", "DS001", "2019018", payload_kind="zip")
@@ -26,7 +31,12 @@ class DartClient:
 
     def __init__(self, api_key: str | None = None, *, timeout: float = 30.0) -> None:
         self._session = DartSession(api_key, timeout=timeout)
-        self.disclosure = Disclosure(self._session)   # 공시정보 (DS001)
+        self.disclosure = Disclosure(self._session)      # 공시정보 (DS001)
+        self.report = Report(self._session)              # 정기보고서 주요정보 (DS002)
+        self.finance = Finance(self._session)            # 정기보고서 재무정보 (DS003)
+        self.ownership = Ownership(self._session)        # 지분공시 (DS004)
+        self.event = Event(self._session)                # 주요사항보고서 (DS005)
+        self.registration = Registration(self._session)  # 증권신고서 (DS006)
 
     def __repr__(self) -> str:
         return f"DartClient({self._session!r})"

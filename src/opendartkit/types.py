@@ -27,3 +27,6 @@ SortField = Literal["date", "crp", "rpt"]
 
 # 정렬 방법: 오름차순 / 내림차순
 SortOrder = Literal["asc", "desc"]
+
+# 재무지표 분류: 수익성 / 안정성 / 성장성 / 활동성 (idx_cl_code)
+IndexClass = Literal["M210000", "M220000", "M230000", "M240000"]

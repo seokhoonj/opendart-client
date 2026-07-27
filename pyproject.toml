@@ -47,7 +47,10 @@ Repository = "https://github.com/seokhoonj/opendartkit"
 packages = ["src/opendartkit"]
 
 [tool.ruff]
-line-length = 88
+# 100, not 88: the OpenDART endpoint constants are long domain names
+# (CONTINGENT_CAPITAL_OUTSTANDING, ...) and a one-line delegating call reads better
+# whole than wrapped across three lines.
+line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
