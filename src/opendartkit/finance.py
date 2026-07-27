@@ -14,9 +14,22 @@ from typing import Any
 
 from ._endpoint import DartEndpoint
 from .session import DartSession
-from .types import IndexClass, ReportCode, StatementDiv
+from .types import IndexClass, ReportCode, StatementDiv, StatementKind
 
 Rows = list[dict[str, Any]]
+
+_MAX_CORP_CODES = 100   # DART returns status 021 above this; fail fast with a clear error
+
+
+def _join_corp_codes(corp_codes: Sequence[str]) -> str:
+    """Comma-join corp_codes for a bulk endpoint, enforcing DART's 100-company cap
+    so an oversized batch fails fast with a clear message instead of wasting a call
+    on a 021 the caller has to decode."""
+    if not 1 <= len(corp_codes) <= _MAX_CORP_CODES:
+        raise ValueError(
+            f"corp_codes must hold 1..{_MAX_CORP_CODES} codes; got {len(corp_codes)}"
+        )
+    return ",".join(corp_codes)
 
 SINGLE_ACCOUNTS = DartEndpoint(
     "fnlttSinglAcnt", "DS003", "2019016",
@@ -73,7 +86,7 @@ class Finance:
         keeps a universe ingest under the daily call limit."""
         return self._session.fetch_list(
             MULTI_ACCOUNTS,
-            corp_code=",".join(corp_codes),
+            corp_code=_join_corp_codes(corp_codes),
             bsns_year=str(fiscal_year),
             reprt_code=report_code,
         )
@@ -122,18 +135,18 @@ class Finance:
         in one call (corp_codes joined comma-separated, max 100)."""
         return self._session.fetch_list(
             MULTI_INDICATORS,
-            corp_code=",".join(corp_codes), bsns_year=str(fiscal_year),
+            corp_code=_join_corp_codes(corp_codes), bsns_year=str(fiscal_year),
             reprt_code=report_code, idx_cl_code=index_class,
         )
 
     def xbrl_document(self, rcept_no: str, *, report_code: ReportCode) -> bytes:
         """재무제표 원본파일(XBRL) (2019019) -- the raw XBRL zip for one filing. Keyed
         by ``rcept_no`` (not corp_code); the caller unzips and parses the XBRL."""
-        return self._session.get_bytes(
+        return self._session.fetch_bytes(
             XBRL_DOCUMENT, rcept_no=rcept_no, reprt_code=report_code
         )
 
-    def xbrl_taxonomy(self, *, statement_kind: str) -> Rows:
+    def xbrl_taxonomy(self, *, statement_kind: StatementKind) -> Rows:
         """XBRL택사노미재무제표양식 (2020001) -- the standard account taxonomy for a
         statement kind (``sj_div``: BS1-4 / IS1-4 / CIS1-4 / CF1-4 / SCE1-2 / ...)."""
         return self._session.fetch_list(XBRL_TAXONOMY, sj_div=statement_kind)

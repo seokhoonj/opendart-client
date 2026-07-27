@@ -20,11 +20,12 @@ import urllib.request
 from typing import Any
 
 from ._endpoint import DartEndpoint
-from .errors import DartError, error_for
+from .errors import DartError, error_for, error_from_xml
 
 _OK = "000"
 _NO_DATA = "013"          # 조회된 데이터가 없습니다 -- an expected empty, not an error
 _API_KEY_ENV = "OPENDART_API_KEY"
+_ZIP_MAGIC = b"PK\x03\x04"   # every zip endpoint (corpCode/document/xbrl) starts with this
 
 Params = dict[str, str | None]
 
@@ -78,10 +79,13 @@ class DartSession:
                 _OK, "response has no 'group' -- flat endpoint? use fetch_list",
                 endpoint.guide_url,
             )
-        return {
-            str(group.get("title", index)): list(group.get("list", []))
-            for index, group in enumerate(groups)
-        }
+        result: dict[str, list[dict[str, Any]]] = {}
+        for index, group in enumerate(groups):
+            title = str(group.get("title", index))
+            if title in result:               # two groups share a title -- disambiguate
+                title = f"{title} ({index})"   # rather than let the later one overwrite
+            result[title] = list(group.get("list", []))
+        return result
 
     def fetch_page(
         self, endpoint: DartEndpoint, **params: str | None
@@ -94,10 +98,16 @@ class DartSession:
             return {"status": _NO_DATA, "list": [], "total_page": 0, "total_count": 0}
         return body
 
-    def get_bytes(self, endpoint: DartEndpoint, **params: str | None) -> bytes:
-        """A zip/binary endpoint's raw bytes (corpCode / document / xbrl)."""
+    def fetch_bytes(self, endpoint: DartEndpoint, **params: str | None) -> bytes:
+        """A zip endpoint's raw bytes (corpCode / document / xbrl). On failure DART
+        returns an error XML instead of a zip; this sniffs the zip magic and raises a
+        typed DartError for that case, so a bad key surfaces as AuthError -- not an
+        opaque BadZipFile when the caller later tries to unzip."""
         self._check_required(endpoint, params)
-        return self._get(endpoint, params)
+        content = self._get(endpoint, params)
+        if not content.startswith(_ZIP_MAGIC):
+            raise error_from_xml(content, endpoint.guide_url)
+        return content
 
     # --- internals -------------------------------------------------------
 
@@ -105,7 +115,15 @@ class DartSession:
         """Validate params, GET, parse JSON, apply the status contract. Returns the
         body dict on 000, ``None`` on 013 (no data), and raises on any other status."""
         self._check_required(endpoint, params)
-        body: dict[str, Any] = json.loads(self._get(endpoint, params))
+        raw = self._get(endpoint, params)
+        try:
+            body: dict[str, Any] = json.loads(raw)
+        except json.JSONDecodeError as err:
+            # OpenDART serves an HTML page during maintenance; surface a typed error
+            # instead of leaking a stdlib JSONDecodeError.
+            raise DartError(
+                "parse", raw[:200].decode("utf-8", "replace"), endpoint.guide_url
+            ) from err
         status = body.get("status")
         if status == _NO_DATA:
             return None

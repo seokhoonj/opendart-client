@@ -30,3 +30,14 @@ SortOrder = Literal["asc", "desc"]
 
 # 재무지표 분류: 수익성 / 안정성 / 성장성 / 활동성 (idx_cl_code)
 IndexClass = Literal["M210000", "M220000", "M230000", "M240000"]
+
+# XBRL 택사노미 재무제표 구분 (sj_div): 재무상태표(BS) / 손익계산서(IS) /
+# 포괄손익계산서(CIS) / 별도포괄손익계산서(DCIS) / 현금흐름표(CF) / 자본변동표(SCE)
+StatementKind = Literal[
+    "BS1", "BS2", "BS3", "BS4",
+    "IS1", "IS2", "IS3", "IS4",
+    "CIS1", "CIS2", "CIS3", "CIS4",
+    "DCIS1", "DCIS2", "DCIS3", "DCIS4", "DCIS5", "DCIS6", "DCIS7", "DCIS8",
+    "CF1", "CF2", "CF3", "CF4",
+    "SCE1", "SCE2",
+]

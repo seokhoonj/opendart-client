@@ -9,6 +9,8 @@ never raised.
 
 from __future__ import annotations
 
+import xml.etree.ElementTree as ET
+
 
 class DartError(RuntimeError):
     """An OpenDART API failure (a non-000, non-013 status, or a transport error).
@@ -60,3 +62,16 @@ _STATUS_TO_ERROR: dict[str, type[DartError]] = {
 def error_for(status: str, message: str, guide_url: str | None = None) -> DartError:
     """Build the most specific DartError subclass for an OpenDART status code."""
     return _STATUS_TO_ERROR.get(status, DartError)(status, message, guide_url)
+
+
+def error_from_xml(content: bytes, guide_url: str | None = None) -> DartError:
+    """Build a DartError from an OpenDART error XML payload (what the JSON-less zip
+    endpoints return on failure). Falls back to a snippet of the raw bytes when the
+    payload is not parseable XML."""
+    try:
+        root = ET.fromstring(content)
+        status = (root.findtext("status") or "").strip()
+        message = (root.findtext("message") or "").strip()
+    except ET.ParseError:
+        status, message = "?", content[:200].decode("utf-8", "replace")
+    return error_for(status or "?", message or "unrecognized response", guide_url)

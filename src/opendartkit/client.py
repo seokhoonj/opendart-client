@@ -15,7 +15,7 @@ from typing import Any
 
 from ._endpoint import DartEndpoint
 from .disclosure import Disclosure
-from .errors import DartError, error_for
+from .errors import DartError, error_from_xml
 from .event import Event
 from .finance import Finance
 from .ownership import Ownership
@@ -46,7 +46,7 @@ class DartClient:
         ``corp_code`` (8-digit DART id), ``corp_name``, ``stock_code`` (6-digit for
         listed companies, else ``None``), ``modify_date``. The base table every
         corp_code-keyed endpoint depends on."""
-        return _parse_corp_code_zip(self._session.get_bytes(CORP_CODE))
+        return _parse_corp_code_zip(self._session.fetch_bytes(CORP_CODE))
 
 
 def _parse_corp_code_zip(content: bytes) -> list[dict[str, Any]]:
@@ -56,13 +56,16 @@ def _parse_corp_code_zip(content: bytes) -> list[dict[str, Any]]:
     try:
         archive = zipfile.ZipFile(io.BytesIO(content))
     except zipfile.BadZipFile:
-        raise _error_from_xml(content) from None
+        raise error_from_xml(content) from None
     with archive:
         names = archive.namelist()
         if not names:
             raise DartError("empty-zip", "corpCode.xml archive has no entries")
         xml_bytes = archive.read(names[0])
-    root = ET.fromstring(xml_bytes)
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError as err:
+        raise DartError("parse", "corpCode.xml entry is not valid XML") from err
     return [
         {
             "corp_code": _text(node, "corp_code"),
@@ -77,13 +80,3 @@ def _parse_corp_code_zip(content: bytes) -> list[dict[str, Any]]:
 def _text(node: ET.Element, tag: str) -> str:
     text = node.findtext(tag)
     return text.strip() if text else ""
-
-
-def _error_from_xml(content: bytes) -> DartError:
-    try:
-        root = ET.fromstring(content)
-        status = (root.findtext("status") or "").strip()
-        message = (root.findtext("message") or "").strip()
-    except ET.ParseError:
-        status, message = "?", content[:200].decode("utf-8", "replace")
-    return error_for(status or "?", message or "unrecognized response")
