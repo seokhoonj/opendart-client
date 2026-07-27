@@ -1,4 +1,4 @@
-# OpenDartClient
+# opendart-client
 
 [![check](https://github.com/seokhoonj/opendart-client/actions/workflows/check.yml/badge.svg)](https://github.com/seokhoonj/opendart-client/actions/workflows/check.yml)
 [![PyPI](https://img.shields.io/pypi/v/opendart-client)](https://pypi.org/project/opendart-client/)
