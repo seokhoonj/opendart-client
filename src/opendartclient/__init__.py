@@ -8,8 +8,8 @@
     profile = dart.disclosure.company("00126380")
     corps = dart.corp_codes()
 
-Returns raw ``list[dict]`` / ``dict``; frame it with ``to_pandas`` / ``to_polars`` or
-your own. Zero runtime dependencies.
+Returns raw ``list[dict]`` / ``dict`` -- frame it your own way, e.g.
+``pandas.DataFrame(rows)`` or ``polars.DataFrame(rows)``. Zero runtime dependencies.
 """
 
 from __future__ import annotations
@@ -25,7 +25,6 @@ from .errors import (
     ServerError,
     ValidationError,
 )
-from .frames import to_pandas, to_polars
 from .resolver import CorpResolver
 from .session import DartSession
 from .types import (
@@ -58,6 +57,4 @@ __all__ = [
     "SortOrder",
     "StatementDiv",
     "ValidationError",
-    "to_pandas",
-    "to_polars",
 ]

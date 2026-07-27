@@ -26,13 +26,12 @@ classifiers = [
 ]
 # No runtime dependencies on purpose: urllib, json, zipfile, and ElementTree from
 # the standard library carry the whole client. A data client that never breaks on a
-# third party's release is worth more than any convenience they would add. pandas /
-# polars are opt-in extras, chosen by the caller -- never forced.
+# third party's release is worth more than any convenience they would add. Rows come
+# back as ``list[dict]``, which ``pandas.DataFrame`` / ``polars.DataFrame`` accept
+# directly, so no DataFrame library is bundled or wrapped.
 dependencies = []
 
 [project.optional-dependencies]
-pandas = ["pandas>=1.5"]
-polars = ["polars>=0.20"]
 dev = [
     "mypy>=1.11",
     "pytest>=8.0",
@@ -63,11 +62,6 @@ testpaths = ["tests"]
 python_version = "3.11"
 files = ["src", "tests"]
 strict = true
-
-# pandas / polars are optional extras; type-checking must not require them installed.
-[[tool.mypy.overrides]]
-module = ["pandas.*", "polars.*"]
-ignore_missing_imports = true
 
 # Tests get the real checks but not the annotation ceremony: `-> None` on every test
 # is noise. The package itself is strict without exception -- it is the part with a
