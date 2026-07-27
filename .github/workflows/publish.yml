@@ -24,6 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      # Naming any permission drops every unnamed one to `none`, so `contents` must
+      # be listed back or checkout cannot read the repo (fails outright on a private
+      # repo, and is the safe default for a public one).
+      contents: read
       id-token: write   # required for OIDC; this is what replaces a stored token
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
