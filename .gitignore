@@ -1,0 +1,22 @@
+# AI coding agents
+CLAUDE.md
+.claude/
+AGENTS.md
+AGENT.md
+.codex/
+GEMINI.md
+.gemini/
+
+dev/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
