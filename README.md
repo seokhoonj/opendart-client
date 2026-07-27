@@ -8,7 +8,7 @@
 **English** | [한국어](https://github.com/seokhoonj/opendart-client/blob/main/README.ko.md)
 
 A clean, typed Python client for Korea's **OpenDART** (전자공시) — the Financial
-Supervisory Service's electronic disclosure system, Korea's answer to SEC EDGAR.
+Supervisory Service's electronic disclosure system.
 
 Zero dependencies. Sync. Returns plain `dict` / `list[dict]`, so you frame it your way.
 
