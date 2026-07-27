@@ -21,6 +21,7 @@ from .finance import Finance
 from .ownership import Ownership
 from .registration import Registration
 from .report import Report
+from .resolver import CorpResolver
 from .session import DartSession
 
 CORP_CODE = DartEndpoint("corpCode", "DS001", "2019018", payload_kind="zip")
@@ -37,9 +38,18 @@ class DartClient:
         self.ownership = Ownership(self._session)        # 지분공시 (DS004)
         self.event = Event(self._session)                # 주요사항보고서 (DS005)
         self.registration = Registration(self._session)  # 증권신고서 (DS006)
+        self._resolver: CorpResolver | None = None
 
     def __repr__(self) -> str:
         return f"DartClient({self._session!r})"
+
+    def resolver(self) -> CorpResolver:
+        """A name / ticker / 초성 / typo -> corp_code resolver, built once from
+        ``corp_codes()`` and cached on this client. The single network call happens on
+        first use only (opt-in), never in the constructor."""
+        if self._resolver is None:
+            self._resolver = CorpResolver(self.corp_codes())
+        return self._resolver
 
     def corp_codes(self) -> list[dict[str, Any]]:
         """고유번호 (2019018). The full corp_code mapping, one dict per company:

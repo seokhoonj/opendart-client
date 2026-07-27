@@ -43,6 +43,13 @@ profile = dart.disclosure.company("00126380")   # -> dict
 # 3) The corp_code <-> stock_code mapping (the base table)
 corps = dart.corp_codes()               # -> list[dict]
 
+# 4) Resolve a name / ticker / 초성 / typo to a corp_code (optional, built once)
+r = dart.resolver()
+r.resolve("삼성전자")                    # -> "00126380"
+r.resolve("005930")                      # ticker  -> "00126380"
+r.resolve("ㅅㅅㅈㅈ")                     # 초성    -> "00126380"
+r.resolve("삼서전자")                     # typo    -> "00126380"
+
 # Frame it however you like (optional):
 from opendartkit import to_pandas
 df = to_pandas(rows)

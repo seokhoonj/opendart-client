@@ -26,6 +26,7 @@ from .errors import (
     ValidationError,
 )
 from .frames import to_pandas, to_polars
+from .resolver import CorpResolver
 from .session import DartSession
 from .types import (
     CorpClass,
@@ -44,6 +45,7 @@ except PackageNotFoundError:               # running from source without an inst
 __all__ = [
     "AuthError",
     "CorpClass",
+    "CorpResolver",
     "DartClient",
     "DartEndpoint",
     "DartError",
