@@ -13,10 +13,10 @@ from .session import DartSession
 
 Rows = list[dict[str, Any]]
 
-EXECUTIVE_HOLDINGS = DartEndpoint(
+INSIDER_HOLDINGS = DartEndpoint(
     "elestock", "DS004", "2019022", required=("corp_code",)
 )
-MAJOR_HOLDINGS = DartEndpoint(
+FIVE_PERCENT_HOLDINGS = DartEndpoint(
     "majorstock", "DS004", "2019021", required=("corp_code",)
 )
 
@@ -27,10 +27,10 @@ class Ownership:
     def __init__(self, session: DartSession) -> None:
         self._session = session
 
-    def executive_holdings(self, corp_code: str) -> Rows:
+    def insider_holdings(self, corp_code: str) -> Rows:
         """임원ㆍ주요주주 소유보고 (2019022) -- insider ownership filings."""
-        return self._session.fetch_list(EXECUTIVE_HOLDINGS, corp_code=corp_code)
+        return self._session.fetch_list(INSIDER_HOLDINGS, corp_code=corp_code)
 
-    def major_holdings(self, corp_code: str) -> Rows:
+    def five_percent_holdings(self, corp_code: str) -> Rows:
         """대량보유 상황보고 (2019021) -- 5%-rule large-holding filings."""
-        return self._session.fetch_list(MAJOR_HOLDINGS, corp_code=corp_code)
+        return self._session.fetch_list(FIVE_PERCENT_HOLDINGS, corp_code=corp_code)

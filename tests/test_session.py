@@ -107,7 +107,7 @@ def test_required_param_rejected_before_any_http():
 
     session._get = _must_not_run  # type: ignore[method-assign]
     with pytest.raises(ValueError, match="corp_code"):
-        session.fetch_page(REQUIRED)  # no corp_code
+        session.fetch_body(REQUIRED)  # no corp_code
     assert not called["hit"]
 
 

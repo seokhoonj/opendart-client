@@ -150,7 +150,7 @@ def test_exactly_85_endpoints_are_wired():
 def test_every_endpoint_is_well_formed():
     for ep in _all_endpoints():
         assert ep.operation and "." not in ep.operation   # a stem, no file extension
-        assert ep.group in {"DS001", "DS002", "DS003", "DS004", "DS005", "DS006"}
+        assert ep.api_group in {"DS001", "DS002", "DS003", "DS004", "DS005", "DS006"}
         assert ep.payload_kind in {"json", "zip"}
         assert ep.response_shape in {"flat", "grouped"}
         assert f"apiId={ep.api_id}" in ep.guide_url

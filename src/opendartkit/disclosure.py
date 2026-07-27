@@ -79,7 +79,7 @@ class Disclosure:
         rows: list[dict[str, Any]] = []
         page = 1
         while True:
-            body = self._session.fetch_page(SEARCH, page_no=str(page), **base)
+            body = self._session.fetch_body(SEARCH, page_no=str(page), **base)
             rows.extend(body.get("list", []))
             total_page = int(body.get("total_page", 1) or 1)
             if page >= total_page or (max_pages is not None and page >= max_pages):
@@ -90,7 +90,7 @@ class Disclosure:
     def company(self, corp_code: str) -> dict[str, Any]:
         """기업개황 (2019002). The company profile (name, ceo, address, industry,
         establishment date, ...) as a dict. Fields sit at the top level of the body."""
-        return self._session.fetch_page(COMPANY, corp_code=corp_code)
+        return self._session.fetch_body(COMPANY, corp_code=corp_code)
 
     def document(self, rcept_no: str) -> bytes:
         """공시서류원본파일 (2019003). The original filing as raw zip bytes; the

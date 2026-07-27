@@ -25,6 +25,9 @@ def _join_corp_codes(corp_codes: Sequence[str]) -> str:
     """Comma-join corp_codes for a bulk endpoint, enforcing DART's 100-company cap
     so an oversized batch fails fast with a clear message instead of wasting a call
     on a 021 the caller has to decode."""
+    if isinstance(corp_codes, str):
+        # a bare str is a Sequence of chars; "00126380" would join as "0,0,1,2,..."
+        raise TypeError("corp_codes must be a list of codes, not a single str")
     if not 1 <= len(corp_codes) <= _MAX_CORP_CODES:
         raise ValueError(
             f"corp_codes must hold 1..{_MAX_CORP_CODES} codes; got {len(corp_codes)}"

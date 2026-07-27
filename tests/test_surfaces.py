@@ -71,10 +71,10 @@ def test_registration_returns_grouped_dict():
     assert groups["인수인"] == [{"b": "2"}]
 
 
-def test_ownership_major_holdings():
+def test_ownership_five_percent_holdings():
     captured: dict = {}
     client = _client({"status": "000", "list": []}, capture=captured)
-    client.ownership.major_holdings("00126380")
+    client.ownership.five_percent_holdings("00126380")
     assert captured["__operation__"] == "majorstock"
     assert captured["corp_code"] == "00126380"
 

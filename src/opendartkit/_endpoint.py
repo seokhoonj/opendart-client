@@ -28,7 +28,7 @@ class DartEndpoint:
     """One OpenDART operation and where its spec lives."""
 
     operation: str                          # stem: "list", "piicDecsn"
-    group: str                              # "DS001"
+    api_group: str                          # "DS001" (apiGrpCd) -- not the grouped-response concept
     api_id: str                             # guide page id = spec authority
     required: tuple[str, ...] = ()          # required params beyond crtfc_key
     payload_kind: PayloadKind = "json"      # "json" | "zip" (corpCode/document/xbrl)
@@ -44,4 +44,4 @@ class DartEndpoint:
 
     @property
     def guide_url(self) -> str:
-        return f"{GUIDE_URL}?apiGrpCd={self.group}&apiId={self.api_id}"
+        return f"{GUIDE_URL}?apiGrpCd={self.api_group}&apiId={self.api_id}"

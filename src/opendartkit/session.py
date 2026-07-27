@@ -12,20 +12,21 @@ self-contained (the consumer injects whatever it resolved).
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import urllib.error
 import urllib.parse
 import urllib.request
+import zipfile
 from typing import Any
 
-from ._endpoint import DartEndpoint
+from ._endpoint import DartEndpoint, ResponseShape
 from .errors import DartError, error_for, error_from_xml
 
 _OK = "000"
 _NO_DATA = "013"          # 조회된 데이터가 없습니다 -- an expected empty, not an error
 _API_KEY_ENV = "OPENDART_API_KEY"
-_ZIP_MAGIC = b"PK\x03\x04"   # every zip endpoint (corpCode/document/xbrl) starts with this
 
 Params = dict[str, str | None]
 
@@ -53,6 +54,7 @@ class DartSession:
         """A flat endpoint's ``list`` array. status 000 -> the rows; 013 -> ``[]``;
         any other status -> DartError. A 000 body without a ``list`` key raises (it is
         almost certainly a grouped endpoint that should use ``fetch_groups``)."""
+        self._require_shape(endpoint, "flat")
         body = self._body(endpoint, params)
         if body is None:
             return []
@@ -70,6 +72,7 @@ class DartSession:
         """A grouped endpoint's ``group[].list[]``, keyed by each group's title.
         status 000 -> the groups; 013 -> ``{}``; other -> DartError. A 000 body
         without a ``group`` key raises (a flat endpoint should use ``fetch_list``)."""
+        self._require_shape(endpoint, "grouped")
         body = self._body(endpoint, params)
         if body is None:
             return {}
@@ -82,12 +85,13 @@ class DartSession:
         result: dict[str, list[dict[str, Any]]] = {}
         for index, group in enumerate(groups):
             title = str(group.get("title", index))
-            if title in result:               # two groups share a title -- disambiguate
-                title = f"{title} ({index})"   # rather than let the later one overwrite
-            result[title] = list(group.get("list", []))
+            key, suffix = title, 1
+            while key in result:               # loop to a free key so no group is ever
+                key, suffix = f"{title} ({suffix})", suffix + 1   # silently overwritten
+            result[key] = list(group.get("list", []))
         return result
 
-    def fetch_page(
+    def fetch_body(
         self, endpoint: DartEndpoint, **params: str | None
     ) -> dict[str, Any]:
         """The full validated response body (for paginated endpoints that need
@@ -100,12 +104,12 @@ class DartSession:
 
     def fetch_bytes(self, endpoint: DartEndpoint, **params: str | None) -> bytes:
         """A zip endpoint's raw bytes (corpCode / document / xbrl). On failure DART
-        returns an error XML instead of a zip; this sniffs the zip magic and raises a
-        typed DartError for that case, so a bad key surfaces as AuthError -- not an
-        opaque BadZipFile when the caller later tries to unzip."""
+        returns an error XML instead of a zip; this checks the payload really is a zip
+        and raises a typed DartError otherwise, so a bad key surfaces as AuthError --
+        not an opaque BadZipFile when the caller later tries to unzip."""
         self._check_required(endpoint, params)
         content = self._get(endpoint, params)
-        if not content.startswith(_ZIP_MAGIC):
+        if not zipfile.is_zipfile(io.BytesIO(content)):
             raise error_from_xml(content, endpoint.guide_url)
         return content
 
@@ -117,13 +121,20 @@ class DartSession:
         self._check_required(endpoint, params)
         raw = self._get(endpoint, params)
         try:
-            body: dict[str, Any] = json.loads(raw)
+            parsed = json.loads(raw)
         except json.JSONDecodeError as err:
             # OpenDART serves an HTML page during maintenance; surface a typed error
             # instead of leaking a stdlib JSONDecodeError.
             raise DartError(
                 "parse", raw[:200].decode("utf-8", "replace"), endpoint.guide_url
             ) from err
+        if not isinstance(parsed, dict):
+            # A valid but non-object JSON body (a bare array/scalar) would otherwise
+            # blow up on body.get(...) with a raw AttributeError.
+            raise DartError(
+                "parse", raw[:200].decode("utf-8", "replace"), endpoint.guide_url
+            )
+        body: dict[str, Any] = parsed
         status = body.get("status")
         if status == _NO_DATA:
             return None
@@ -136,6 +147,17 @@ class DartSession:
         if missing:
             given = sorted(k for k, v in params.items() if v)
             raise ValueError(f"{endpoint.operation} requires {missing}; got {given}")
+
+    def _require_shape(self, endpoint: DartEndpoint, expected: ResponseShape) -> None:
+        """Enforce flat-vs-grouped BEFORE the call, so a misroute raises even on a 013
+        (no-data) response -- where the body-level ``list``/``group`` guard cannot fire."""
+        if endpoint.response_shape != expected:
+            other = "fetch_groups" if expected == "flat" else "fetch_list"
+            raise DartError(
+                "shape",
+                f"{endpoint.operation} is {endpoint.response_shape}; use {other}",
+                endpoint.guide_url,
+            )
 
     def _get(self, endpoint: DartEndpoint, params: Params) -> bytes:
         query = {"crtfc_key": self.api_key}
