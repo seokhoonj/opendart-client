@@ -1,6 +1,11 @@
 # OpenDartClient
 
-[한국어](https://github.com/seokhoonj/opendart-client/blob/main/README.ko.md)
+[![check](https://github.com/seokhoonj/opendart-client/actions/workflows/check.yml/badge.svg)](https://github.com/seokhoonj/opendart-client/actions/workflows/check.yml)
+[![PyPI](https://img.shields.io/pypi/v/opendart-client)](https://pypi.org/project/opendart-client/)
+[![Python](https://img.shields.io/pypi/pyversions/opendart-client)](https://pypi.org/project/opendart-client/)
+[![License](https://img.shields.io/pypi/l/opendart-client)](https://github.com/seokhoonj/opendart-client/blob/main/LICENSE)
+
+**English** | [한국어](https://github.com/seokhoonj/opendart-client/blob/main/README.ko.md)
 
 A clean, typed Python client for Korea's **OpenDART** (전자공시) — the Financial
 Supervisory Service's electronic disclosure system, Korea's answer to SEC EDGAR.

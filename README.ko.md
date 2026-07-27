@@ -1,6 +1,11 @@
 # OpenDartClient
 
-[English](https://github.com/seokhoonj/opendart-client/blob/main/README.md)
+[![check](https://github.com/seokhoonj/opendart-client/actions/workflows/check.yml/badge.svg)](https://github.com/seokhoonj/opendart-client/actions/workflows/check.yml)
+[![PyPI](https://img.shields.io/pypi/v/opendart-client)](https://pypi.org/project/opendart-client/)
+[![Python](https://img.shields.io/pypi/pyversions/opendart-client)](https://pypi.org/project/opendart-client/)
+[![License](https://img.shields.io/pypi/l/opendart-client)](https://github.com/seokhoonj/opendart-client/blob/main/LICENSE)
+
+[English](https://github.com/seokhoonj/opendart-client/blob/main/README.md) | **한국어**
 
 한국 **OpenDART**(금융감독원 전자공시시스템) API를 위한 깔끔한 타입드 파이썬 클라이언트.
 미국 SEC EDGAR에 해당하는 그 전자공시죠.
