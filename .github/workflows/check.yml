@@ -1,0 +1,13 @@
+name: check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    # The full check lives in reusable-check.yml so the release gate in
+    # publish.yml runs the identical job.
+    uses: ./.github/workflows/reusable-check.yml

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "opendartclient"
+name = "opendart-client"
 version = "0.1.0"
 description = "A clean, sync, typed Python client for Korea's OpenDART (전자공시) disclosure API."
 readme = "README.md"
@@ -40,8 +40,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/seokhoonj/opendartclient"
-Repository = "https://github.com/seokhoonj/opendartclient"
+Homepage = "https://github.com/seokhoonj/opendart-client"
+Repository = "https://github.com/seokhoonj/opendart-client"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/opendartclient"]

@@ -1,6 +1,6 @@
 # OpenDartClient
 
-[English](https://github.com/seokhoonj/opendartclient/blob/main/README.md)
+[English](https://github.com/seokhoonj/opendart-client/blob/main/README.md)
 
 한국 **OpenDART**(금융감독원 전자공시시스템) API를 위한 깔끔한 타입드 파이썬 클라이언트.
 미국 SEC EDGAR에 해당하는 그 전자공시죠.
@@ -10,7 +10,7 @@
 ## 설치
 
 ```bash
-pip install opendartclient
+pip install opendart-client
 ```
 
 무료 API 키(40자리)는 <https://opendart.fss.or.kr> 에서 발급.
@@ -48,7 +48,7 @@ to_pandas(rows)
   (`dart.event.convertible_bond(...)`, `cvbdIsDecsn` 아님).
 - **회사 리졸버** — 이름 / 티커 / 초성(`ㅅㅅㅈㅈ`) / 오타 → `corp_code`.
 - **런타임 의존성 0개** — 표준 라이브러리만. `pandas` · `polars`는 선택 extra
-  (`pip install 'opendartclient[pandas]'`).
+  (`pip install 'opendart-client[pandas]'`).
 - **완전 타입드**, `py.typed` 동봉. 닫힌 어휘는 `Literal`이라 잘못된 코드는 API가
   아니라 타입체커가 잡음.
 - **raw 반환** — `list[dict]`(flat) · `dict[str, list[dict]]`(grouped) · `bytes`(zip

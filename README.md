@@ -1,6 +1,6 @@
 # OpenDartClient
 
-[한국어](https://github.com/seokhoonj/opendartclient/blob/main/README.ko.md)
+[한국어](https://github.com/seokhoonj/opendart-client/blob/main/README.ko.md)
 
 A clean, typed Python client for Korea's **OpenDART** (전자공시) — the Financial
 Supervisory Service's electronic disclosure system, Korea's answer to SEC EDGAR.
@@ -10,7 +10,7 @@ Zero dependencies. Sync. Returns plain `dict` / `list[dict]`, so you frame it yo
 ## Install
 
 ```bash
-pip install opendartclient
+pip install opendart-client
 ```
 
 Get a free API key (40 chars) at <https://opendart.fss.or.kr>.
@@ -48,7 +48,7 @@ to_pandas(rows)
   as readable methods (`dart.event.convertible_bond(...)`, not `cvbdIsDecsn`).
 - **Company resolver** — name / ticker / 초성 (`ㅅㅅㅈㅈ`) / typo → `corp_code`.
 - **Zero runtime dependencies** — the standard library carries it all. `pandas` and
-  `polars` are opt-in extras (`pip install 'opendartclient[pandas]'`).
+  `polars` are opt-in extras (`pip install 'opendart-client[pandas]'`).
 - **Fully typed**, ships `py.typed`; closed vocabularies are `Literal`s, so a bad code
   fails the type checker, not the API.
 - **Raw returns** — `list[dict]` (flat), `dict[str, list[dict]]` (grouped), `bytes`

@@ -2,7 +2,7 @@
 
 The client returns raw ``list[dict]`` so it depends on no DataFrame library. These
 helpers turn that into a pandas or polars frame *if* the caller installed the extra
-(``pip install 'opendartclient[pandas]'`` / ``[polars]``). Neither import runs unless
+(``pip install 'opendart-client[pandas]'`` / ``[polars]``). Neither import runs unless
 the helper is called, so the core stays dependency-free.
 """
 
@@ -23,7 +23,7 @@ def to_pandas(rows: Rows) -> pd.DataFrame:
         import pandas as pd
     except ImportError as err:
         raise ImportError(
-            "to_pandas needs pandas -- install with: pip install 'opendartclient[pandas]'"
+            "to_pandas needs pandas -- install with: pip install 'opendart-client[pandas]'"
         ) from err
     return pd.DataFrame(rows)
 
@@ -34,6 +34,6 @@ def to_polars(rows: Rows) -> pl.DataFrame:
         import polars as pl
     except ImportError as err:
         raise ImportError(
-            "to_polars needs polars -- install with: pip install 'opendartclient[polars]'"
+            "to_polars needs polars -- install with: pip install 'opendart-client[polars]'"
         ) from err
     return pl.DataFrame(rows)

@@ -1,0 +1,37 @@
+name: publish
+
+# Publish to PyPI when a GitHub Release is published. Authentication is via PyPI
+# Trusted Publishing (OIDC): no API token or password is stored anywhere -- GitHub
+# mints a short-lived identity token that PyPI verifies against the publisher
+# registered for this repo (owner seokhoonj / repo opendart-client / this workflow /
+# environment "pypi").
+#
+# A release event fires this independently of check.yml, so a red build would
+# otherwise upload anyway. The `gate` job runs the *same* reusable check -- the full
+# 3.11/3.14 matrix, lint, types, zero-dependency and py.typed assertions -- on the
+# release commit, and `publish` needs it: a failing suite cannot reach the upload.
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  gate:
+    uses: ./.github/workflows/reusable-check.yml
+
+  publish:
+    needs: gate
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # required for OIDC; this is what replaces a stored token
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade build
+          python -m build
+      - uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1

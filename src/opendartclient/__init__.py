@@ -38,7 +38,7 @@ from .types import (
 )
 
 try:
-    __version__ = version("opendartclient")   # single source of truth: pyproject.toml
+    __version__ = version("opendart-client")   # single source of truth: pyproject.toml
 except PackageNotFoundError:               # running from source without an install
     __version__ = "0.0.0+unknown"
 
