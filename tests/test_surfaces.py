@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from opendartclient import OpenDart
+from opendart_client import OpenDart
 
 
 def _client(body: dict, *, capture: dict | None = None) -> OpenDart:

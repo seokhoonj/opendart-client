@@ -7,7 +7,7 @@ import zipfile
 
 import pytest
 
-from opendartclient import (
+from opendart_client import (
     AuthError,
     DartError,
     OpenDart,
@@ -15,10 +15,10 @@ from opendartclient import (
     ServerError,
     ValidationError,
 )
-from opendartclient._endpoint import DartEndpoint
-from opendartclient.disclosure import Disclosure
-from opendartclient.errors import error_for
-from opendartclient.session import DartSession
+from opendart_client._endpoint import DartEndpoint
+from opendart_client.disclosure import Disclosure
+from opendart_client.errors import error_for
+from opendart_client.session import DartSession
 
 
 def _session_returning_bytes(payload: bytes) -> DartSession:
@@ -32,7 +32,7 @@ def _session_returning_bytes(payload: bytes) -> DartSession:
 def test_non_json_body_raises_dart_error_not_jsondecodeerror():
     # OpenDART serves HTML during maintenance; the caller must see a DartError.
     session = _session_returning_bytes(b"<html>maintenance</html>")
-    from opendartclient.disclosure import SEARCH
+    from opendart_client.disclosure import SEARCH
     with pytest.raises(DartError) as exc:
         session.fetch_list(SEARCH)
     assert exc.value.status == "parse"
@@ -42,7 +42,7 @@ def test_fetch_bytes_on_error_xml_raises_typed_error_not_badzipfile():
     # A zip endpoint that fails returns error XML, not a zip. fetch_bytes must raise
     # AuthError -- not hand back bytes that later blow up as BadZipFile.
     err_xml = b"<result><status>010</status><message>bad key</message></result>"
-    from opendartclient.client import CORP_CODE
+    from opendart_client.client import CORP_CODE
     with pytest.raises(AuthError) as exc:
         _session_returning_bytes(err_xml).fetch_bytes(CORP_CODE)
     assert exc.value.status == "010"
@@ -53,7 +53,7 @@ def test_fetch_bytes_passes_a_real_zip_through():
     with zipfile.ZipFile(buffer, "w") as archive:
         archive.writestr("x.xml", "<result></result>")
     zip_bytes = buffer.getvalue()
-    from opendartclient.client import CORP_CODE
+    from opendart_client.client import CORP_CODE
     assert _session_returning_bytes(zip_bytes).fetch_bytes(CORP_CODE) == zip_bytes
 
 
@@ -126,7 +126,7 @@ def test_search_clamps_page_count_and_rejects_bad_max_pages():
 # --- the endpoint-mapping contract (all 85) --------------------------------
 
 def _all_endpoints() -> list[DartEndpoint]:
-    from opendartclient import (
+    from opendart_client import (
         client,
         disclosure,
         event,

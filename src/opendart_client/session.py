@@ -163,7 +163,7 @@ class DartSession:
         query = {"crtfc_key": self.api_key}
         query.update({k: v for k, v in params.items() if v is not None})
         url = f"{endpoint.url}?{urllib.parse.urlencode(query)}"
-        request = urllib.request.Request(url, headers={"User-Agent": "opendartclient"})
+        request = urllib.request.Request(url, headers={"User-Agent": "opendart-client"})
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
                 content: bytes = response.read()

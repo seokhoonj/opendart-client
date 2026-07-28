@@ -8,9 +8,9 @@ import zipfile
 
 import pytest
 
-from opendartclient import DartError, OpenDart
-from opendartclient._endpoint import DartEndpoint
-from opendartclient.session import DartSession
+from opendart_client import DartError, OpenDart
+from opendart_client._endpoint import DartEndpoint
+from opendart_client.session import DartSession
 
 
 def _zip(names_to_xml: dict[str, str]) -> bytes:
@@ -49,7 +49,7 @@ def test_get_builds_url_with_key_params_and_honors_timeout(monkeypatch):
         return _Resp()
 
     monkeypatch.setattr("urllib.request.urlopen", _fake_urlopen)
-    from opendartclient.disclosure import SEARCH
+    from opendart_client.disclosure import SEARCH
     DartSession(api_key="TESTKEY", timeout=12.5).fetch_list(SEARCH, corp_code="00126380")
     assert "crtfc_key=TESTKEY" in captured["url"]
     assert "corp_code=00126380" in captured["url"]
@@ -61,7 +61,7 @@ def test_get_builds_url_with_key_params_and_honors_timeout(monkeypatch):
 
 @pytest.mark.parametrize("payload", [b"[]", b"null", b'"text"', b"123"])
 def test_non_object_json_body_raises_dart_error(payload):
-    from opendartclient.disclosure import SEARCH
+    from opendart_client.disclosure import SEARCH
     session = DartSession(api_key="TESTKEY")
     session._get = lambda endpoint, params: payload  # type: ignore[method-assign]
     with pytest.raises(DartError) as exc:
@@ -72,7 +72,7 @@ def test_non_object_json_body_raises_dart_error(payload):
 # --- valid empty zip --------------------------------------------------------
 
 def test_fetch_bytes_accepts_a_valid_empty_zip():
-    from opendartclient.client import CORP_CODE
+    from opendart_client.client import CORP_CODE
     session = DartSession(api_key="TESTKEY")
     empty = _empty_zip()
     session._get = lambda endpoint, params: empty  # type: ignore[method-assign]
@@ -181,7 +181,7 @@ def test_document_and_xbrl_return_raw_zip_bytes():
 
 
 def test_binary_public_path_propagates_error_xml_as_typed_error():
-    from opendartclient import AuthError
+    from opendart_client import AuthError
     client = OpenDart(api_key="TESTKEY")
     client._session._get = (  # type: ignore[method-assign]
         lambda endpoint, params: b"<result><status>010</status><message>bad key</message></result>"
@@ -201,7 +201,7 @@ def test_company_returns_the_full_body_envelope():
 
 
 def test_search_raises_on_a_000_body_missing_list():
-    from opendartclient.disclosure import Disclosure
+    from opendart_client.disclosure import Disclosure
     session = DartSession(api_key="TESTKEY")
     session._get = lambda endpoint, params: b'{"status": "000", "total_page": 1}'  # type: ignore[method-assign]
     with pytest.raises(DartError, match="no 'list'"):

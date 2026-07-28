@@ -49,8 +49,8 @@ jobs:
           requires = md.requires('opendart-client') or []
           runtime = [r for r in requires if 'extra ==' not in r]
           assert not runtime, f'runtime dependencies appeared: {runtime}'
-          import opendartclient
-          print('opendartclient', opendartclient.__version__, 'imports with no third-party packages')
+          import opendart_client
+          print('opendart_client', opendart_client.__version__, 'imports with no third-party packages')
           "
 
       - name: Confirm a user's type checker can see the hints
@@ -61,7 +61,7 @@ jobs:
           uv venv /tmp/typed --python ${{ matrix.python-version }}
           uv pip install --python /tmp/typed/bin/python . mypy
           cat > /tmp/user_code.py <<'PY'
-          from opendartclient import OpenDart
+          from opendart_client import OpenDart
 
           dart = OpenDart(api_key="x")
           # report_code is a Literal["11011","11012","11013","11014"]; "99999" is not one.

@@ -8,7 +8,7 @@ wrong DART endpoint. The table is copied from the OpenDART guide, not from the s
 on purpose: it is the second witness.
 """
 
-from opendartclient._endpoint import DartEndpoint
+from opendart_client._endpoint import DartEndpoint
 
 # (api_id, operation, api_group, response_shape)
 AUTHORITATIVE: set[tuple[str, str, str, str]] = {
@@ -107,7 +107,7 @@ AUTHORITATIVE: set[tuple[str, str, str, str]] = {
 
 
 def _source_endpoints() -> set[tuple[str, str, str, str]]:
-    from opendartclient import (
+    from opendart_client import (
         client,
         disclosure,
         event,

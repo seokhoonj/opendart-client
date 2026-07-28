@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from opendartclient.resolver import CorpResolver, choseong
+from opendart_client.resolver import CorpResolver, choseong
 
 
 def _row(corp_code: str, name: str, stock: str | None) -> dict[str, Any]:

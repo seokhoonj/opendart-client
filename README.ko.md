@@ -23,7 +23,7 @@ pip install opendart-client
 ## 빠른 시작
 
 ```python
-from opendartclient import OpenDart
+from opendart_client import OpenDart
 
 dart = OpenDart(api_key="...")          # 또는 환경변수 OPENDART_API_KEY
 

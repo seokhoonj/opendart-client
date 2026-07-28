@@ -23,7 +23,7 @@ Get a free API key (40 chars) at <https://opendart.fss.or.kr>.
 ## Quickstart
 
 ```python
-from opendartclient import OpenDart
+from opendart_client import OpenDart
 
 dart = OpenDart(api_key="...")          # or set OPENDART_API_KEY in the environment
 

@@ -1,6 +1,6 @@
-"""opendartclient -- a clean, sync, typed client for Korea's OpenDART (전자공시) API.
+"""opendart-client -- a clean, sync, typed client for Korea's OpenDART (전자공시) API.
 
-    from opendartclient import OpenDart
+    from opendart_client import OpenDart
 
     dart = OpenDart(api_key="...")          # or set OPENDART_API_KEY
     rows = dart.disclosure.search(corp_code="00126380",
