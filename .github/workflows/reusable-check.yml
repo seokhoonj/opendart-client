@@ -16,7 +16,7 @@ jobs:
       matrix:
         # The floor and the current release. requires-python is >=3.11, so 3.11 is
         # the version that claim has to hold on; the upper end tracks current CPython.
-        python-version: ["3.11", "3.14"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
