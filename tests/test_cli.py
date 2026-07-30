@@ -104,19 +104,22 @@ def test_finance_readable_and_separate(monkeypatch, capsys):
     monkeypatch.setattr(cli, "OpenDart", FakeOpenDart)
     assert cli.main(["--api-key", "x", "finance", "삼성", "--year", "2025"]) == 0
     output = capsys.readouterr().out
-    assert "매출액        1,234,567" in output
-    assert "영업이익       12,345" in output
-    assert "당기순이익" in output and "500,000" in output   # (손실) label still matched
-    assert "400,000" not in output                          # duplicate row not printed
-    assert "7,654,321" not in output
+    assert "1,234,567" in output          # 매출액
+    assert "12,345" in output             # 영업이익
+    assert "500,000" in output            # 당기순이익, matched past the (손실) label
+    assert "400,000" not in output        # the duplicate net-income row is not printed
+    assert "7,654,321" not in output      # OFS revenue must not leak into the CFS view
+    # the numeric column is right-aligned: every data line ends at the same width
+    data = [ln for ln in output.splitlines() if any(ch.isdigit() for ch in ln)]
+    assert len({cli._display_width(ln) for ln in data[1:]}) == 1
 
     assert cli.main(
         ["--api-key", "x", "finance", "삼성", "--year", "2025", "--separate"]
     ) == 0
     output = capsys.readouterr().out
     assert "(OFS 별도)" in output
-    assert "매출액        7,654,321" in output
-    assert "1,234,567" not in output
+    assert "7,654,321" in output           # OFS revenue shown under --separate
+    assert "1,234,567" not in output       # CFS revenue must not leak into the OFS view
 
 
 def test_company_json(monkeypatch, capsys):

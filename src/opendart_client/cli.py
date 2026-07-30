@@ -6,6 +6,7 @@ import argparse
 import datetime
 import json
 import sys
+import unicodedata
 from typing import Any
 
 from .client import OpenDart
@@ -89,6 +90,17 @@ def _format_amount(value: object) -> str:
         return raw
 
 
+def _display_width(text: str) -> int:
+    """Terminal cell width: East-Asian Wide/Fullwidth glyphs (Hangul, ...) take two
+    cells, so padding by ``len`` misaligns a column of mixed Korean labels."""
+    return sum(2 if unicodedata.east_asian_width(c) in ("W", "F") else 1 for c in text)
+
+
+def _pad(text: str, width: int) -> str:
+    """Left-justify ``text`` to ``width`` terminal cells (wide glyphs counted as two)."""
+    return text + " " * max(0, width - _display_width(text))
+
+
 def _canonical_account(name: str) -> str:
     """Normalize a DART account label for key-account matching. DART writes 당기순이익 as
     '당기순이익(손실)' and uses an inner space in '법인세차감전 순이익', so an exact-string
@@ -119,10 +131,14 @@ def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
         name = _canonical_account(str(row.get("account_nm", "")))
         if name in _KEY_ACCOUNTS and name not in picked:   # keep the first match only
             picked[name] = row
-    for account_name in _KEY_ACCOUNTS:
-        hit = picked.get(account_name)
-        if hit is not None:
-            print(f"{account_name:<10} {_format_amount(hit.get('thstrm_amount', ''))}")
+    lines = [
+        (name, _format_amount(picked[name].get("thstrm_amount", "")))
+        for name in _KEY_ACCOUNTS
+        if name in picked
+    ]
+    amount_w = max((len(amount) for _, amount in lines), default=0)
+    for name, amount in lines:
+        print(f"{_pad(name, 12)} {amount:>{amount_w}}")   # right-align the numeric column
     return 0
 
 
