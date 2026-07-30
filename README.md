@@ -66,6 +66,15 @@ dart.event.paid_in_capital_increase(
 A `corp_code` resolves from a full name, ticker, initial consonants (`ㅅㅅㅈㅈ`), or a
 typo (`dart.resolver().resolve(...)`). A query with no matching data comes back empty.
 
+Returns are `list[dict]`, so pandas / polars build a DataFrame directly.
+
+```python
+import pandas as pd
+import polars as pl
+
+pd.DataFrame(rows)   # or pl.DataFrame(rows)
+```
+
 ## 3. API
 
 **Top-level helpers** — find a company, or list them all.
@@ -206,21 +215,7 @@ All take `(corp_code, *, begin_date, end_date)`.
 | `stock_exchange` | Comprehensive stock exchange / transfer |
 | `division` | Division |
 
-## 4. DataFrames
-
-Returns are `list[dict]`, so pandas / polars build a DataFrame directly.
-
-```python
-import pandas as pd
-pd.DataFrame(rows)
-```
-
-```python
-import polars as pl
-pl.DataFrame(rows)
-```
-
-## 5. Terminal
+## 4. Terminal
 
 Installing puts an `opendart` command on your PATH (also `python -m opendart_client`).
 The key is read from `--api-key`, the environment, or the config file.
@@ -260,13 +255,13 @@ $ opendart finance 삼성전자 --year 2024
 자본총계     402,192,070,000,000
 ```
 
-## 6. AI coding agents
+## 5. AI coding agents
 
 This repo doubles as a plugin marketplace for Claude Code and Codex — it ships
 `resolve`, `search`, `company`, and `finance` as skills that call the `opendart`
 command. Install the package and set an API key first (above).
 
-### 6.1. Claude Code
+### 5.1. Claude Code
 
 ```
 /plugin marketplace add seokhoonj/opendart-client
@@ -276,7 +271,7 @@ command. Install the package and set an API key first (above).
 Then just ask ("find Samsung Electronics' corp_code", "show 삼성전자's recent filings"),
 or call a skill directly — `/opendart:resolve 삼성전자`, `/opendart:finance 삼성전자 --year 2024`.
 
-### 6.2. Codex
+### 5.2. Codex
 
 ```
 codex plugin marketplace add seokhoonj/opendart-client
@@ -292,6 +287,6 @@ Prefer no plugin? Symlink a skill into your skills directory and call it bare (`
 ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
 ```
 
-## 7. License
+## 6. License
 
 MIT © Seokhoon Joo

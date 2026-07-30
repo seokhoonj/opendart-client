@@ -63,6 +63,15 @@ dart.event.paid_in_capital_increase(
 회사코드(`corp_code`)는 정식 이름·티커·초성(`ㅅㅅㅈㅈ`)·오타 어느 것으로도 찾을 수 있습니다
 (`dart.resolver().resolve(...)`). 해당 자료가 없는 조회는 빈 결과로 옵니다.
 
+반환은 `list[dict]`이라 pandas·polars 표(DataFrame)로 바로 만들 수 있습니다.
+
+```python
+import pandas as pd
+import polars as pl
+
+pd.DataFrame(rows)   # 또는 pl.DataFrame(rows)
+```
+
 ## 3. API
 
 **최상위 도우미** — 회사코드를 찾거나 전체 목록을 받습니다.
@@ -202,21 +211,7 @@ dart.event.paid_in_capital_increase(
 | `stock_exchange` | 주식의 포괄적 교환·이전 |
 | `division` | 분할 |
 
-## 4. 데이터프레임
-
-조회 결과는 `list[dict]`이라 pandas·polars 표(DataFrame)로 바로 만들 수 있습니다.
-
-```python
-import pandas as pd
-pd.DataFrame(rows)
-```
-
-```python
-import polars as pl
-pl.DataFrame(rows)
-```
-
-## 5. 터미널
+## 4. 터미널
 
 설치하면 `opendart` 명령이 등록됩니다(`python -m opendart_client`로도 실행). 키는 위
 세 곳(인자·환경변수·config 파일) 중 하나에서 읽습니다.
@@ -254,13 +249,13 @@ $ opendart finance 삼성전자 --year 2024
 자본총계     402,192,070,000,000
 ```
 
-## 6. AI 코딩 에이전트에서 사용
+## 5. AI 코딩 에이전트에서 사용
 
 이 저장소는 Claude Code·Codex용 플러그인 마켓플레이스도 겸합니다 — `resolve`·`search`·
 `company`·`finance`를 `opendart` 명령을 호출하는 스킬로 제공합니다. 먼저 위에서 패키지를
 설치하고 API 키를 설정하세요.
 
-### 6.1. Claude Code
+### 5.1. Claude Code
 
 ```
 /plugin marketplace add seokhoonj/opendart-client
@@ -270,7 +265,7 @@ $ opendart finance 삼성전자 --year 2024
 그런 다음 평범하게 물어보거나("삼성전자 회사코드 찾아줘", "삼성전자 최근 공시 보여줘"),
 스킬을 직접 호출하세요 — `/opendart:resolve 삼성전자`, `/opendart:finance 삼성전자 --year 2024`.
 
-### 6.2. Codex
+### 5.2. Codex
 
 ```
 codex plugin marketplace add seokhoonj/opendart-client
@@ -286,6 +281,6 @@ codex plugin add opendart@opendart-client
 ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
 ```
 
-## 7. 라이선스
+## 6. 라이선스
 
 MIT © Seokhoon Joo
