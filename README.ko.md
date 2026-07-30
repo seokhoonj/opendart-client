@@ -20,13 +20,23 @@ pip install opendart-client
 ```
 
 무료 API 키(40자리)는 <https://opendart.fss.or.kr> 에서 발급받으실 수 있습니다. 키는
-`OpenDart(api_key=...)`, 환경변수, config 파일 순으로 찾습니다.
+`OpenDart(api_key=...)`, 환경변수 `OPENDART_API_KEY`, config 파일 순으로 찾습니다.
+
+**config 파일 (모든 OS 공통, 권장)** — `~/.config/opendart-client/credentials.json` 파일을
+만들고 아래를 넣으세요.
+
+```json
+{ "api_key": "..." }
+```
+
+**환경변수** — 셸에 따라 다릅니다. macOS·Linux(bash/zsh):
 
 ```sh
 export OPENDART_API_KEY=...
 ```
 
-또는 `~/.config/opendart-client/credentials.json` 파일에 `{"api_key": "..."}`를 둡니다.
+Windows PowerShell은 `setx OPENDART_API_KEY "..."`(영구) 또는
+`$env:OPENDART_API_KEY = "..."`(현재 세션)를 씁니다.
 
 ## 2. 빠른 시작
 
@@ -244,6 +254,38 @@ $ opendart finance 삼성전자 --year 2024
 자본총계     402,192,070,000,000
 ```
 
-## 6. 라이선스
+## 6. AI 코딩 에이전트에서 사용
+
+이 저장소는 Claude Code·Codex용 플러그인 마켓플레이스도 겸합니다 — `resolve`·`search`·
+`company`·`finance`를 `opendart` 명령을 호출하는 스킬로 제공합니다. 먼저 위에서 패키지를
+설치하고 API 키를 설정하세요.
+
+### 6.1. Claude Code
+
+```
+/plugin marketplace add seokhoonj/opendart-client
+/plugin install opendart@opendart-client
+```
+
+그런 다음 평범하게 물어보거나("삼성전자 회사코드 찾아줘", "삼성전자 최근 공시 보여줘"),
+스킬을 직접 호출하세요 — `/opendart:resolve 삼성전자`, `/opendart:finance 삼성전자 --year 2024`.
+
+### 6.2. Codex
+
+```
+codex plugin marketplace add seokhoonj/opendart-client
+codex plugin add opendart@opendart-client
+```
+
+`resolve`·`search`·`company`·`finance` 스킬은 회사 이름·티커에 반응하며, `opendart <명령>
+<회사>`로 직접 실행해도 됩니다.
+
+플러그인 없이 쓰려면? 스킬을 스킬 디렉터리에 symlink해 bare 형식(`/resolve`)으로 부르세요:
+
+```sh
+ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
+```
+
+## 7. 라이선스
 
 MIT © Seokhoon Joo

@@ -22,13 +22,24 @@ pip install opendart-client
 ```
 
 Get a free API key (40 chars) at <https://opendart.fss.or.kr>. The key is read from
-`OpenDart(api_key=...)`, the environment, then a config file — in that order.
+`OpenDart(api_key=...)`, the `OPENDART_API_KEY` environment variable, then a config
+file — in that order.
+
+**Config file (all platforms, recommended)** — create
+`~/.config/opendart-client/credentials.json` with:
+
+```json
+{ "api_key": "..." }
+```
+
+**Environment variable** — shell-specific. macOS/Linux (bash/zsh):
 
 ```sh
 export OPENDART_API_KEY=...
 ```
 
-Or put `{"api_key": "..."}` in `~/.config/opendart-client/credentials.json`.
+On Windows PowerShell use `setx OPENDART_API_KEY "..."` (persistent) or
+`$env:OPENDART_API_KEY = "..."` (current session).
 
 ## 2. Quickstart
 
@@ -249,6 +260,38 @@ $ opendart finance 삼성전자 --year 2024
 자본총계     402,192,070,000,000
 ```
 
-## 6. License
+## 6. AI coding agents
+
+This repo doubles as a plugin marketplace for Claude Code and Codex — it ships
+`resolve`, `search`, `company`, and `finance` as skills that call the `opendart`
+command. Install the package and set an API key first (above).
+
+### 6.1. Claude Code
+
+```
+/plugin marketplace add seokhoonj/opendart-client
+/plugin install opendart@opendart-client
+```
+
+Then just ask ("find Samsung Electronics' corp_code", "show 삼성전자's recent filings"),
+or call a skill directly — `/opendart:resolve 삼성전자`, `/opendart:finance 삼성전자 --year 2024`.
+
+### 6.2. Codex
+
+```
+codex plugin marketplace add seokhoonj/opendart-client
+codex plugin add opendart@opendart-client
+```
+
+The `resolve`, `search`, `company`, and `finance` skills react to a company name or
+ticker, and you can always run `opendart <command> <company>` directly.
+
+Prefer no plugin? Symlink a skill into your skills directory and call it bare (`/resolve`):
+
+```sh
+ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
+```
+
+## 7. License
 
 MIT © Seokhoon Joo

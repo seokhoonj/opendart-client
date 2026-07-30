@@ -1,0 +1,20 @@
+{
+  "name": "opendart",
+  "version": "0.1.0",
+  "description": "Look up Korean company disclosures, profiles, and financials from the command line, powered by the opendart-client CLI",
+  "author": { "name": "seokhoonj", "url": "https://github.com/seokhoonj" },
+  "homepage": "https://github.com/seokhoonj/opendart-client",
+  "repository": "https://github.com/seokhoonj/opendart-client",
+  "license": "MIT",
+  "keywords": ["opendart", "dart", "korea", "disclosure", "finance", "전자공시"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "opendart",
+    "shortDescription": "Read Korean company disclosures and financials",
+    "longDescription": "Resolve a Korean company name/ticker/initials to a corp_code, list its disclosures, show its company profile, or summarize its key financial accounts -- from OpenDART (전자공시) via the opendart-client CLI.",
+    "developerName": "seokhoonj",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": ["삼성전자 회사코드 찾아줘", "삼성전자 최근 공시 보여줘", "삼성전자 2024 재무 요약해줘"]
+  }
+}

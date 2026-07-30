@@ -1,0 +1,17 @@
+{
+  "name": "opendart-client",
+  "owner": { "name": "seokhoonj" },
+  "description": "Read disclosure data from Korea's OpenDART",
+  "plugins": [
+    {
+      "name": "opendart",
+      "displayName": "opendart",
+      "source": "./plugins/opendart",
+      "description": "Read disclosure data from Korea's OpenDART",
+      "author": { "name": "seokhoonj" },
+      "homepage": "https://github.com/seokhoonj/opendart-client",
+      "category": "Productivity",
+      "keywords": ["opendart", "dart", "korea", "disclosure", "finance", "전자공시"]
+    }
+  ]
+}
