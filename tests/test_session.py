@@ -30,8 +30,9 @@ def _session(body: dict, *, capture: dict | None = None) -> DartSession:
     return session
 
 
-def test_missing_key_raises(monkeypatch):
+def test_missing_key_raises(monkeypatch, tmp_path):
     monkeypatch.delenv("OPENDART_API_KEY", raising=False)
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
     with pytest.raises(ValueError, match="OPENDART_API_KEY"):
         DartSession()
 
@@ -39,6 +40,35 @@ def test_missing_key_raises(monkeypatch):
 def test_env_key_is_used(monkeypatch):
     monkeypatch.setenv("OPENDART_API_KEY", "FROMENV")
     assert DartSession().api_key == "FROMENV"
+
+
+def test_config_file_key_is_used(monkeypatch, tmp_path):
+    monkeypatch.delenv("OPENDART_API_KEY", raising=False)
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    config = tmp_path / "opendart-client" / "credentials.json"
+    config.parent.mkdir()
+    config.write_text(json.dumps({"api_key": "FROMFILE"}), encoding="utf-8")
+    assert DartSession().api_key == "FROMFILE"
+
+
+def test_key_precedence(monkeypatch, tmp_path):
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    config = tmp_path / "opendart-client" / "credentials.json"
+    config.parent.mkdir()
+    config.write_text(json.dumps({"api_key": "FROMFILE"}), encoding="utf-8")
+    monkeypatch.setenv("OPENDART_API_KEY", "FROMENV")
+    assert DartSession().api_key == "FROMENV"
+    assert DartSession(api_key="FROMARG").api_key == "FROMARG"
+
+
+def test_malformed_config_file_raises(monkeypatch, tmp_path):
+    monkeypatch.delenv("OPENDART_API_KEY", raising=False)
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    config = tmp_path / "opendart-client" / "credentials.json"
+    config.parent.mkdir()
+    config.write_text("{bad json", encoding="utf-8")
+    with pytest.raises(ValueError, match=str(config)):
+        DartSession()
 
 
 def test_endpoint_url_and_guide():

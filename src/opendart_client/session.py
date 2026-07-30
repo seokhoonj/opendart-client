@@ -5,9 +5,10 @@ The session holds the API key and turns an endpoint + params into Python data: a
 raw ``bytes`` for the zip endpoints. No third-party HTTP client -- ``urllib`` carries
 it, so the package has zero runtime dependencies.
 
-The key comes from the constructor, or the ``OPENDART_API_KEY`` environment variable
-as a fallback. The session never reads any application's config file; it is
-self-contained (the consumer injects whatever it resolved).
+The key comes from the constructor, the ``OPENDART_API_KEY`` environment variable,
+or the package's own ``~/.config/opendart-client/credentials.json``, in that order.
+The session never reads a consuming application's config file; its config is
+self-contained.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
+from pathlib import Path
 from typing import Any
 
 from ._endpoint import DartEndpoint, ResponseShape
@@ -31,14 +33,35 @@ _API_KEY_ENV = "OPENDART_API_KEY"
 Params = dict[str, str | None]
 
 
+def _config_path() -> Path:
+    base = os.environ.get("XDG_CONFIG_HOME") or (Path.home() / ".config")
+    return Path(base) / "opendart-client" / "credentials.json"
+
+
+def _key_from_config_file() -> str:
+    path = _config_path()
+    if not path.is_file():
+        return ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as err:
+        raise ValueError(f"{path} is not valid JSON: {err}") from err
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must be a JSON object with an 'api_key' field")
+    return str(data.get("api_key", "")).strip()
+
+
 class DartSession:
     """Holds the API key; fetches endpoints as raw Python data."""
 
     def __init__(self, api_key: str | None = None, *, timeout: float = 30.0) -> None:
-        key = (api_key or os.environ.get(_API_KEY_ENV, "")).strip()
+        key = (
+            api_key or os.environ.get(_API_KEY_ENV, "") or _key_from_config_file()
+        ).strip()
         if not key:
             raise ValueError(
-                f"OpenDART API key required: pass api_key=... or set ${_API_KEY_ENV}"
+                f"OpenDART API key required: pass api_key=..., set ${_API_KEY_ENV}, "
+                f"or add {_config_path()}"
             )
         self.api_key = key
         self.timeout = timeout
