@@ -63,10 +63,8 @@ def _run_search(dart: OpenDart, args: argparse.Namespace) -> int:
     shown = rows[: args.limit]
     print(f"{corp_code}  {len(rows)} filings")
     for row in shown:
-        print(
-            f"{row.get('rcept_dt', '')}  {row.get('rcept_no', '')}  "
-            f"{row.get('report_nm', '')}"
-        )
+        report = str(row.get("report_nm", "")).strip()
+        print(f"{row.get('rcept_dt', '')}  {row.get('rcept_no', '')}  {report}")
     return 0
 
 
@@ -91,6 +89,13 @@ def _format_amount(value: object) -> str:
         return raw
 
 
+def _canonical_account(name: str) -> str:
+    """Normalize a DART account label for key-account matching. DART writes 당기순이익 as
+    '당기순이익(손실)' and uses an inner space in '법인세차감전 순이익', so an exact-string
+    match would silently drop those; strip the parenthetical qualifier and spaces."""
+    return name.split("(")[0].replace(" ", "").strip()
+
+
 def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
     corp_code = _resolve(dart, args.company)
     rows = dart.finance.single_accounts(
@@ -107,15 +112,17 @@ def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
     statement_div = "OFS" if args.separate else "CFS"
     label = "OFS 별도" if args.separate else "CFS 연결"
     print(f"{corp_code}  {args.year} report {args.report}  ({label})")
-    by_name = {
-        row.get("account_nm"): row
-        for row in rows
-        if row.get("fs_div") == statement_div
-    }
+    picked: dict[str, Row] = {}
+    for row in rows:
+        if row.get("fs_div") != statement_div:
+            continue
+        name = _canonical_account(str(row.get("account_nm", "")))
+        if name in _KEY_ACCOUNTS and name not in picked:   # keep the first match only
+            picked[name] = row
     for account_name in _KEY_ACCOUNTS:
-        row = by_name.get(account_name)
-        if row is not None:
-            print(f"{account_name:<10} {_format_amount(row.get('thstrm_amount', ''))}")
+        hit = picked.get(account_name)
+        if hit is not None:
+            print(f"{account_name:<10} {_format_amount(hit.get('thstrm_amount', ''))}")
     return 0
 
 

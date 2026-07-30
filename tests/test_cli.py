@@ -28,6 +28,10 @@ COMPANY = {"corp_name": "삼성전자", "ceo_nm": "대표", "stock_code": "00593
 ACCOUNTS = [
     {"account_nm": "매출액", "fs_div": "CFS", "thstrm_amount": "1234567"},
     {"account_nm": "영업이익", "fs_div": "CFS", "thstrm_amount": "12,345"},
+    # DART labels net income "당기순이익(손실)" and repeats it (지배/비지배); the summary
+    # must still surface it, taking the first row only.
+    {"account_nm": "당기순이익(손실)", "fs_div": "CFS", "thstrm_amount": "500000"},
+    {"account_nm": "당기순이익(손실)", "fs_div": "CFS", "thstrm_amount": "400000"},
     {"account_nm": "매출액", "fs_div": "OFS", "thstrm_amount": "7654321"},
     {"account_nm": "기타", "fs_div": "CFS", "thstrm_amount": "999"},
 ]
@@ -102,6 +106,8 @@ def test_finance_readable_and_separate(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert "매출액        1,234,567" in output
     assert "영업이익       12,345" in output
+    assert "당기순이익" in output and "500,000" in output   # (손실) label still matched
+    assert "400,000" not in output                          # duplicate row not printed
     assert "7,654,321" not in output
 
     assert cli.main(
