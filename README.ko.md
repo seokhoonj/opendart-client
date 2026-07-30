@@ -7,20 +7,26 @@
 
 [English](https://github.com/seokhoonj/opendart-client/blob/main/README.md) | **한국어**
 
-한국 **OpenDART**(금융감독원 전자공시시스템) API를 위한 깔끔한 타입드 파이썬 클라이언트.
-미국 SEC EDGAR에 해당하는 그 전자공시죠.
+한국 **OpenDART**(금융감독원 전자공시시스템)의 공시 데이터를 읽어옵니다.
 
-의존성 0개, 동기(sync), `dict` / `list[dict]` 그대로 반환 — DataFrame은 원하는 대로.
+기업개황과 기간별 공시 목록, 재무제표와 주요 재무지표, 배당·증자·감자, 최대주주·소액주주·
+임원·직원 현황과 임원 보수, 합병·분할·영업양수도·자기주식 취득 같은 주요 결정, 지분공시(5%룰),
+증권신고서까지 다룹니다.
 
-## 설치
+## 1. 설치
 
 ```bash
 pip install opendart-client
 ```
 
-무료 API 키(40자리)는 <https://opendart.fss.or.kr> 에서 발급.
+무료 API 키(40자리)는 <https://opendart.fss.or.kr> 에서 발급받으실 수 있습니다. 키는
+`OpenDart(api_key=...)`로 넘기거나 환경변수로 설정합니다.
 
-## 빠른 시작
+```sh
+export OPENDART_API_KEY=...
+```
+
+## 2. 빠른 시작
 
 ```python
 from opendart_client import OpenDart
@@ -40,35 +46,29 @@ dart.finance.single_accounts(code, fiscal_year=2025)
 dart.event.paid_in_capital_increase(
     corp_code=code, begin_date="20260101", end_date="20260131",
 )
-
-# DataFrame이 필요하면 — 반환이 list[dict]이라 생성자에 그대로 넣으면 됩니다
-import pandas as pd
-pd.DataFrame(rows)
-# 또는
-import polars as pl
-pl.DataFrame(rows)
 ```
 
-## 특징
+회사코드(`corp_code`)는 정식 이름·티커·초성(`ㅅㅅㅈㅈ`)·오타 어느 것으로도 찾을 수 있습니다
+(`dart.resolver().resolve(...)`). 해당 자료가 없는 조회는 빈 결과로 옵니다.
 
-- **OpenDART 85개 엔드포인트 전부** — 공시정보 · 정기보고서 · 재무정보 · 지분공시 ·
-  주요사항보고서 · 증권신고서 6그룹을, **읽히는 메서드명**으로
-  (`dart.event.convertible_bond(...)`, `cvbdIsDecsn` 아님).
-- **회사 리졸버** — 이름 / 티커 / 초성(`ㅅㅅㅈㅈ`) / 오타 → `corp_code`.
-- **런타임 의존성 0개** — 표준 라이브러리만. 반환이 `list[dict]`이라 `pandas.DataFrame` ·
-  `polars.DataFrame` 생성자에 바로 넣으면 됩니다(어댑터 불필요).
-- **완전 타입드**, `py.typed` 동봉. 닫힌 어휘는 `Literal`이라 잘못된 코드는 API가
-  아니라 타입체커가 잡음.
-- **raw 반환** — `list[dict]`(flat) · `dict[str, list[dict]]`(grouped) · `bytes`(zip
-  엔드포인트). `status 013`(데이터 없음)은 빈 결과, 그 외 에러는 타입드 `DartError`.
+## 3. API
 
-## API
+**최상위 도우미** — 회사코드를 찾거나 전체 목록을 받습니다.
 
-최상위: `dart.corp_codes()` (전체 corp_code↔이름/티커), `dart.resolver()` →
-`CorpResolver.resolve(query)` / `.search(query)`.
+| 호출 | 하는 일 |
+|---|---|
+| `dart.corp_codes()` | 전체 회사의 회사코드 ↔ 이름/티커 목록 |
+| `dart.resolver().resolve(query)` | 이름·티커·초성·오타로 회사 하나를 회사코드로 |
+| `dart.resolver().search(query)` | 같은 조건으로 후보 목록 |
 
-`report_code` 기본값 `"11011"`(사업보고서). 다른 값: `11012` 반기, `11013` 1분기,
-`11014` 3분기.
+**`report_code`** — 정기보고서·재무정보 메서드가 공통으로 받는 기간 코드(기본값 `11011`).
+
+| 코드 | 보고서 |
+|---|---|
+| `11011` | 사업보고서 (기본값) |
+| `11012` | 반기보고서 |
+| `11013` | 1분기보고서 |
+| `11014` | 3분기보고서 |
 
 ### disclosure — 공시정보
 
@@ -190,6 +190,20 @@ pl.DataFrame(rows)
 | `stock_exchange` | 주식의 포괄적 교환·이전 |
 | `division` | 분할 |
 
-## 라이선스
+## 4. 데이터프레임
+
+조회 결과는 `list[dict]`이라 pandas·polars 표(DataFrame)로 바로 만들 수 있습니다.
+
+```python
+import pandas as pd
+pd.DataFrame(rows)
+```
+
+```python
+import polars as pl
+pl.DataFrame(rows)
+```
+
+## 5. 라이선스
 
 MIT © Seokhoon Joo

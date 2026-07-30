@@ -7,27 +7,35 @@
 
 **English** | [한국어](https://github.com/seokhoonj/opendart-client/blob/main/README.ko.md)
 
-A clean, typed Python client for Korea's **OpenDART** (전자공시) — the Financial
-Supervisory Service's electronic disclosure system.
+Read disclosure data from Korea's **OpenDART** (the Financial Supervisory Service's
+electronic disclosure system).
 
-Zero dependencies. Sync. Returns plain `dict` / `list[dict]`, so you frame it your way.
+Company profiles and filing lists, financial statements and key ratios, dividends and
+capital changes, largest / minority shareholders, officers, employees and their pay,
+major decisions like mergers, spin-offs, business transfers and treasury-stock buybacks,
+ownership filings (the 5% rule), and securities-registration statements.
 
-## Install
+## 1. Install
 
 ```bash
 pip install opendart-client
 ```
 
-Get a free API key (40 chars) at <https://opendart.fss.or.kr>.
+Get a free API key (40 chars) at <https://opendart.fss.or.kr>. Pass it as
+`OpenDart(api_key=...)`, or set it in the environment:
 
-## Quickstart
+```sh
+export OPENDART_API_KEY=...
+```
+
+## 2. Quickstart
 
 ```python
 from opendart_client import OpenDart
 
 dart = OpenDart(api_key="...")          # or set OPENDART_API_KEY in the environment
 
-# resolve a name / ticker / 초성 / typo -> corp_code
+# resolve a name / ticker / initials / typo -> corp_code
 code = dart.resolver().resolve("삼성전자")          # "00126380"
 
 # disclosures filed in a date window
@@ -40,37 +48,30 @@ dart.finance.single_accounts(code, fiscal_year=2025)
 dart.event.paid_in_capital_increase(
     corp_code=code, begin_date="20260101", end_date="20260131",
 )
-
-# want a DataFrame? returns are list[dict], which the constructors take directly
-import pandas as pd
-pd.DataFrame(rows)
-# or
-import polars as pl
-pl.DataFrame(rows)
 ```
 
-## Features
+A `corp_code` resolves from a full name, ticker, initial consonants (`ㅅㅅㅈㅈ`), or a
+typo (`dart.resolver().resolve(...)`). A query with no matching data comes back empty.
 
-- **All 85 OpenDART endpoints** across six groups — disclosure, periodic reports,
-  financial statements, ownership, major-event reports, securities registration —
-  as readable methods (`dart.event.convertible_bond(...)`, not `cvbdIsDecsn`).
-- **Company resolver** — name / ticker / 초성 (`ㅅㅅㅈㅈ`) / typo → `corp_code`.
-- **Zero runtime dependencies** — the standard library carries it all. Rows come back
-  as `list[dict]`, which `pandas.DataFrame` / `polars.DataFrame` accept directly, so
-  no DataFrame adapter is needed.
-- **Fully typed**, ships `py.typed`; closed vocabularies are `Literal`s, so a bad code
-  fails the type checker, not the API.
-- **Raw returns** — `list[dict]` (flat), `dict[str, list[dict]]` (grouped), `bytes`
-  (zip endpoints). `status 013` (no data) is an empty result; other errors raise a
-  typed `DartError`.
+## 3. API
 
-## API
+**Top-level helpers** — find a company, or list them all.
 
-Top level: `dart.corp_codes()` (all corp_code ↔ name / ticker), `dart.resolver()` →
-`CorpResolver.resolve(query)` / `.search(query)`.
+| Call | What it returns |
+|---|---|
+| `dart.corp_codes()` | Every company's corp_code ↔ name / ticker |
+| `dart.resolver().resolve(query)` | One corp_code from a name, ticker, initials, or typo |
+| `dart.resolver().search(query)` | Candidate matches for the same query |
 
-`report_code` defaults to `"11011"` (annual report). Others: `11012` half-year,
-`11013` Q1, `11014` Q3.
+**`report_code`** — the period shared by the periodic-report and finance methods
+(defaults to `11011`).
+
+| Code | Report |
+|---|---|
+| `11011` | Annual report (default) |
+| `11012` | Half-year |
+| `11013` | Q1 |
+| `11014` | Q3 |
 
 ### disclosure
 
@@ -192,6 +193,20 @@ All take `(corp_code, *, begin_date, end_date)`.
 | `stock_exchange` | Comprehensive stock exchange / transfer |
 | `division` | Division |
 
-## License
+## 4. DataFrames
+
+Returns are `list[dict]`, so pandas / polars build a DataFrame directly.
+
+```python
+import pandas as pd
+pd.DataFrame(rows)
+```
+
+```python
+import polars as pl
+pl.DataFrame(rows)
+```
+
+## 5. License
 
 MIT © Seokhoon Joo
