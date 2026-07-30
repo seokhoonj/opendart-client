@@ -218,7 +218,7 @@ The key is read from `--api-key`, the environment, or the config file.
 opendart resolve 삼성전자                   # name / ticker / initials / typo -> corp_code (+ candidates)
 opendart search  삼성전자 --begin 20260101   # filings in a date window
 opendart company 삼성전자                   # company profile
-opendart finance 삼성전자 --year 2025        # key accounts (revenue, operating & net income, assets/liabilities/equity)
+opendart finance 삼성전자 --year 2024        # key accounts (revenue, operating & net income, assets/liabilities/equity)
 ```
 
 The `<company>` argument takes a name, ticker, initials, typo, or an 8-digit corp_code
@@ -231,6 +231,22 @@ the ticker.
 ```
 $ opendart resolve 삼성전자
 00126380  005930  삼성전자
+00252074  ------  삼성전자판매
+00366997  ------  삼성전자로지텍
+```
+
+`finance` heads the key accounts with the company and report name (`--separate` for the
+separate statements).
+
+```
+$ opendart finance 삼성전자 --year 2024
+삼성전자 (00126380)  2024 사업보고서  (CFS 연결)
+매출액       300,870,903,000,000
+영업이익      32,725,961,000,000
+당기순이익    34,451,351,000,000
+자산총계     514,531,948,000,000
+부채총계     112,339,878,000,000
+자본총계     402,192,070,000,000
 ```
 
 ## 6. License
