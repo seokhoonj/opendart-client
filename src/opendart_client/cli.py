@@ -14,6 +14,12 @@ from .errors import DartError
 
 Row = dict[str, Any]
 _KEY_ACCOUNTS = ("매출액", "영업이익", "당기순이익", "자산총계", "부채총계", "자본총계")
+_REPORT_NAMES = {
+    "11011": "사업보고서",
+    "11012": "반기보고서",
+    "11013": "1분기보고서",
+    "11014": "3분기보고서",
+}
 _COMPANY_FIELDS = (
     "corp_name",
     "corp_cls",
@@ -30,6 +36,13 @@ def _resolve(dart: OpenDart, company: str) -> str:
     if len(company) == 8 and company.isdigit():
         return company
     return dart.resolver().resolve(company)
+
+
+def _company_name(dart: OpenDart, corp_code: str) -> str:
+    """The corp_name for a corp_code, from the in-memory resolver (search short-circuits
+    on an exact corp_code). Empty string if the code is unknown."""
+    rows = dart.resolver().search(corp_code)
+    return str(rows[0].get("corp_name", "")) if rows else ""
 
 
 def _dump_json(value: object) -> None:
@@ -123,7 +136,10 @@ def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
         return 0
     statement_div = "OFS" if args.separate else "CFS"
     label = "OFS 별도" if args.separate else "CFS 연결"
-    print(f"{corp_code}  {args.year} report {args.report}  ({label})")
+    name = _company_name(dart, corp_code)
+    who = f"{name} ({corp_code})" if name else corp_code
+    report_name = _REPORT_NAMES.get(args.report, args.report)
+    print(f"{who}  {args.year} {report_name}  ({label})")
     picked: dict[str, Row] = {}
     for row in rows:
         if row.get("fs_div") != statement_div:
