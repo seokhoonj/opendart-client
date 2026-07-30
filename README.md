@@ -21,12 +21,14 @@ ownership filings (the 5% rule), and securities-registration statements.
 pip install opendart-client
 ```
 
-Get a free API key (40 chars) at <https://opendart.fss.or.kr>. Pass it as
-`OpenDart(api_key=...)`, or set it in the environment:
+Get a free API key (40 chars) at <https://opendart.fss.or.kr>. The key is read from
+`OpenDart(api_key=...)`, the environment, then a config file — in that order.
 
 ```sh
 export OPENDART_API_KEY=...
 ```
+
+Or put `{"api_key": "..."}` in `~/.config/opendart-client/credentials.json`.
 
 ## 2. Quickstart
 
@@ -207,6 +209,30 @@ import polars as pl
 pl.DataFrame(rows)
 ```
 
-## 5. License
+## 5. Terminal
+
+Installing puts an `opendart` command on your PATH (also `python -m opendart_client`).
+The key is read from `--api-key`, the environment, or the config file.
+
+```sh
+opendart resolve 삼성전자                   # name / ticker / initials / typo -> corp_code (+ candidates)
+opendart search  삼성전자 --begin 20260101   # filings in a date window
+opendart company 삼성전자                   # company profile
+opendart finance 삼성전자 --year 2025        # key accounts (revenue, operating & net income, assets/liabilities/equity)
+```
+
+The `<company>` argument takes a name, ticker, initials, typo, or an 8-digit corp_code
+— it resolves to a corp_code internally. Each command prints a readable summary by
+default; `--json` prints the full result. See `--help` for options.
+
+`resolve` lists corp_code, ticker, then name; an unlisted company shows `------` for
+the ticker.
+
+```
+$ opendart resolve 삼성전자
+00126380  005930  삼성전자
+```
+
+## 6. License
 
 MIT © Seokhoon Joo

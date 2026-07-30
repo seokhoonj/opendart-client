@@ -20,11 +20,13 @@ pip install opendart-client
 ```
 
 무료 API 키(40자리)는 <https://opendart.fss.or.kr> 에서 발급받으실 수 있습니다. 키는
-`OpenDart(api_key=...)`로 넘기거나 환경변수로 설정합니다.
+`OpenDart(api_key=...)`, 환경변수, config 파일 순으로 찾습니다.
 
 ```sh
 export OPENDART_API_KEY=...
 ```
+
+또는 `~/.config/opendart-client/credentials.json` 파일에 `{"api_key": "..."}`를 둡니다.
 
 ## 2. 빠른 시작
 
@@ -204,6 +206,29 @@ import polars as pl
 pl.DataFrame(rows)
 ```
 
-## 5. 라이선스
+## 5. 터미널
+
+설치하면 `opendart` 명령이 등록됩니다(`python -m opendart_client`로도 실행). 키는 위
+세 곳(인자·환경변수·config 파일) 중 하나에서 읽습니다.
+
+```sh
+opendart resolve 삼성전자                   # 이름·티커·초성·오타 -> 회사코드 (+후보)
+opendart search  삼성전자 --begin 20260101   # 기간 내 공시 목록
+opendart company 삼성전자                   # 기업개황
+opendart finance 삼성전자 --year 2025        # 주요계정 요약 (매출·영업이익·순이익·자산/부채/자본)
+```
+
+`<회사>` 자리엔 이름·티커·초성·오타·8자리 회사코드 아무거나 넣으면 내부에서 회사코드로
+바꿔 조회합니다. 각 명령은 기본이 읽기 좋은 요약이고, `--json`은 전체 결과를 냅니다.
+옵션은 `--help`로 확인하세요.
+
+`resolve`는 회사코드·티커·이름 순으로 정렬해 보여주며, 비상장사는 티커 자리가 `------`입니다.
+
+```
+$ opendart resolve 삼성전자
+00126380  005930  삼성전자
+```
+
+## 6. 라이선스
 
 MIT © Seokhoon Joo

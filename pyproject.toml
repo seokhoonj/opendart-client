@@ -42,6 +42,9 @@ dev = [
 Homepage = "https://github.com/seokhoonj/opendart-client"
 Repository = "https://github.com/seokhoonj/opendart-client"
 
+[project.scripts]
+opendart = "opendart_client.cli:main"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/opendart_client"]
 
