@@ -212,9 +212,9 @@ pl.DataFrame(rows)
 세 곳(인자·환경변수·config 파일) 중 하나에서 읽습니다.
 
 ```sh
-opendart resolve 삼성전자                   # 이름·티커·초성·오타 -> 회사코드 (+후보)
+opendart resolve 삼성전자                    # 이름·티커·초성·오타 -> 회사코드 (+후보)
 opendart search  삼성전자 --begin 20260101   # 기간 내 공시 목록
-opendart company 삼성전자                   # 기업개황
+opendart company 삼성전자                    # 기업개황
 opendart finance 삼성전자 --year 2024        # 주요계정 요약 (매출·영업이익·순이익·자산/부채/자본)
 ```
 

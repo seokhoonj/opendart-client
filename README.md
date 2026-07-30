@@ -215,9 +215,9 @@ Installing puts an `opendart` command on your PATH (also `python -m opendart_cli
 The key is read from `--api-key`, the environment, or the config file.
 
 ```sh
-opendart resolve 삼성전자                   # name / ticker / initials / typo -> corp_code (+ candidates)
+opendart resolve 삼성전자                    # name / ticker / initials / typo -> corp_code (+ candidates)
 opendart search  삼성전자 --begin 20260101   # filings in a date window
-opendart company 삼성전자                   # company profile
+opendart company 삼성전자                    # company profile
 opendart finance 삼성전자 --year 2024        # key accounts (revenue, operating & net income, assets/liabilities/equity)
 ```
 
