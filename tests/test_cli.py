@@ -144,6 +144,13 @@ def test_search_limit_and_corp_code_passthrough(monkeypatch, capsys):
     assert instance.resolver().resolve_calls == []
 
 
+def test_search_negative_limit_shows_no_rows(monkeypatch, capsys):
+    monkeypatch.setattr(cli, "OpenDart", FakeOpenDart)
+    assert cli.main(["--api-key", "x", "search", "00126380", "--limit", "-1"]) == 0
+    # a negative --limit clamps to 0 rows, never slices from the end
+    assert capsys.readouterr().out.splitlines() == ["00126380  3 filings"]
+
+
 def test_no_subcommand_returns_two(capsys):
     assert cli.main([]) == 2
     assert "usage: opendart" in capsys.readouterr().out

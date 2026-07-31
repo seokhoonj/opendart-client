@@ -156,9 +156,9 @@ def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
         for account_name in _KEY_ACCOUNTS
         if account_name in row_by_account
     ]
-    amount_w = max((len(amount) for _, amount in lines), default=0)
+    amount_width = max((len(amount) for _, amount in lines), default=0)
     for account_name, amount in lines:
-        print(f"{_pad(account_name, 12)} {amount:>{amount_w}}")
+        print(f"{_pad(account_name, 12)} {amount:>{amount_width}}")
     return 0
 
 

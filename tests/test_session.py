@@ -88,6 +88,17 @@ def test_whitespace_key_falls_through_to_next_source(monkeypatch, tmp_path):
     assert DartSession(api_key="   ").api_key == "FROMENV"
 
 
+def test_valid_arg_does_not_read_a_broken_config(monkeypatch, tmp_path):
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    config = tmp_path / "opendart-client" / "credentials.json"
+    config.parent.mkdir()
+    config.write_text("{broken", encoding="utf-8")   # would raise ValueError if opened
+    # a constructor or env key short-circuits before the config file is ever read
+    assert DartSession(api_key="FROMARG").api_key == "FROMARG"
+    monkeypatch.setenv("OPENDART_API_KEY", "FROMENV")
+    assert DartSession().api_key == "FROMENV"
+
+
 def test_endpoint_url_and_guide():
     assert FLAT.url == "https://opendart.fss.or.kr/api/list.json"
     assert "apiGrpCd=DS001" in FLAT.guide_url and "apiId=2019001" in FLAT.guide_url
@@ -125,6 +136,12 @@ def test_fetch_list_on_grouped_body_raises_not_silent_empty():
         _session(grouped_body).fetch_list(FLAT)
 
 
+def test_fetch_list_non_dict_rows_raises():
+    # a 000 body whose 'list' holds non-objects must not be returned as list[dict]
+    with pytest.raises(DartError, match="list of objects"):
+        _session({"status": "000", "list": ["oops"]}).fetch_list(FLAT)
+
+
 def test_fetch_groups_parses_titled_groups():
     body = {"status": "000", "group": [
         {"title": "증권의 종류", "list": [{"stksen": "보통주", "stkcnt": "100"}]},
@@ -142,6 +159,12 @@ def test_fetch_groups_no_data_returns_empty_dict():
 def test_fetch_groups_on_flat_body_raises():
     with pytest.raises(DartError, match="flat endpoint"):
         _session({"status": "000", "list": [{"a": 1}]}).fetch_groups(GROUPED)
+
+
+def test_fetch_groups_non_dict_rows_raises():
+    body = {"status": "000", "group": [{"title": "일반", "list": ["oops"]}]}
+    with pytest.raises(DartError, match="list of objects"):
+        _session(body).fetch_groups(GROUPED)
 
 
 def test_required_param_rejected_before_any_http():

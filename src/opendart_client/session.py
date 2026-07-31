@@ -103,7 +103,11 @@ class DartSession:
                 _OK, "response has no 'list' -- grouped endpoint? use fetch_groups",
                 endpoint.guide_url,
             )
-        return list(rows)
+        if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+            raise DartError(
+                "parse", "response 'list' is not a list of objects", endpoint.guide_url,
+            )
+        return rows
 
     def fetch_groups(
         self, endpoint: DartEndpoint, **params: str | None
@@ -121,13 +125,23 @@ class DartSession:
                 _OK, "response has no 'group' -- flat endpoint? use fetch_list",
                 endpoint.guide_url,
             )
+        if not isinstance(groups, list):
+            raise DartError("parse", "response 'group' is not a list", endpoint.guide_url)
         result: dict[str, list[dict[str, Any]]] = {}
         for index, group in enumerate(groups):
+            if not isinstance(group, dict):
+                raise DartError("parse", "a 'group' entry is not an object", endpoint.guide_url)
             title = str(group.get("title", index))
+            rows = group.get("list", [])
+            if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+                raise DartError(
+                    "parse", f"group {title!r} 'list' is not a list of objects",
+                    endpoint.guide_url,
+                )
             key, suffix = title, 1
             while key in result:               # loop to a free key so no group is ever
                 key, suffix = f"{title} ({suffix})", suffix + 1   # silently overwritten
-            result[key] = list(group.get("list", []))
+            result[key] = rows
         return result
 
     def fetch_body(
@@ -208,8 +222,9 @@ class DartSession:
                 content: bytes = response.read()
                 return content
         except urllib.error.HTTPError as err:
-            raise DartError(
-                "http", f"HTTP {err.code} for {endpoint.operation}", endpoint.guide_url
-            ) from err
+            with err:   # an HTTPError is an unclosed response; release its socket
+                raise DartError(
+                    "http", f"HTTP {err.code} for {endpoint.operation}", endpoint.guide_url
+                ) from err
         except urllib.error.URLError as err:
             raise DartError("network", str(err.reason), endpoint.guide_url) from err
