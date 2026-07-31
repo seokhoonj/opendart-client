@@ -295,7 +295,8 @@ codex plugin add opendart@opendart-client
 The `resolve`, `search`, `company`, and `finance` skills react to a company name or
 ticker, and you can always run `opendart <command> <company>` directly.
 
-Prefer no plugin? Symlink a skill into your skills directory and call it bare (`/resolve`):
+Prefer not to install the plugin? Symlink a skill into your skills directory and call it
+without the `opendart:` prefix, as `/resolve`:
 
 ```sh
 ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve

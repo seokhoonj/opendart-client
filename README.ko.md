@@ -289,7 +289,8 @@ codex plugin add opendart@opendart-client
 `resolve`·`search`·`company`·`finance` 스킬은 회사 이름·티커에 반응하며, `opendart <명령>
 <회사>`로 직접 실행해도 됩니다.
 
-플러그인 없이 쓰려면? 스킬을 스킬 디렉터리에 symlink해 bare 형식(`/resolve`)으로 부르세요:
+플러그인으로 설치하지 않고 쓰려면, 스킬을 스킬 디렉터리에 symlink한 뒤 접두사(`opendart:`)
+없이 `/resolve`처럼 부르면 됩니다:
 
 ```sh
 ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
