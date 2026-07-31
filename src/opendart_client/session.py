@@ -43,21 +43,32 @@ def _key_from_config_file() -> str:
     if not path.is_file():
         return ""
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError) as err:
+        text = path.read_text(encoding="utf-8")
+    except OSError as err:
+        raise ValueError(f"cannot read {path}: {err}") from err
+    try:
+        credentials = json.loads(text)
+    except json.JSONDecodeError as err:
         raise ValueError(f"{path} is not valid JSON: {err}") from err
-    if not isinstance(data, dict):
+    if not isinstance(credentials, dict):
         raise ValueError(f"{path} must be a JSON object with an 'api_key' field")
-    return str(data.get("api_key", "")).strip()
+    api_key = credentials.get("api_key", "")
+    if not isinstance(api_key, str):    # a JSON null/number/array would coerce to a bogus key
+        raise ValueError(f"{path} field 'api_key' must be a string")
+    return api_key.strip()
 
 
 class DartSession:
     """Holds the API key; fetches endpoints as raw Python data."""
 
     def __init__(self, api_key: str | None = None, *, timeout: float = 30.0) -> None:
+        # strip each source before falling through, so a whitespace-only higher-precedence
+        # value does not mask a valid one further down the chain
         key = (
-            api_key or os.environ.get(_API_KEY_ENV, "") or _key_from_config_file()
-        ).strip()
+            (api_key or "").strip()
+            or (os.environ.get(_API_KEY_ENV) or "").strip()
+            or _key_from_config_file()
+        )
         if not key:
             raise ValueError(
                 f"OpenDART API key required: pass api_key=..., set ${_API_KEY_ENV}, "

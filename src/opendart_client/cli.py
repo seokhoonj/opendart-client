@@ -74,7 +74,7 @@ def _run_search(dart: OpenDart, args: argparse.Namespace) -> int:
     if args.json:
         _dump_json(rows)
         return 0
-    shown = rows[: args.limit]
+    shown = rows[: max(0, args.limit)]   # a negative --limit must not slice from the end
     print(f"{corp_code}  {len(rows)} filings")
     for row in shown:
         report = str(row.get("report_nm", "")).strip()
@@ -88,10 +88,10 @@ def _run_company(dart: OpenDart, args: argparse.Namespace) -> int:
     if args.json:
         _dump_json(company)
         return 0
-    for label in _COMPANY_FIELDS:
-        value = company.get(label)
-        if value:
-            print(f"{label:<12} {value}")
+    for field_name in _COMPANY_FIELDS:
+        field_value = company.get(field_name)
+        if field_value:
+            print(f"{field_name:<12} {field_value}")
     return 0
 
 
@@ -135,26 +135,29 @@ def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
         _dump_json(rows)
         return 0
     statement_div = "OFS" if args.separate else "CFS"
-    label = "OFS 별도" if args.separate else "CFS 연결"
-    name = _company_name(dart, corp_code)
-    who = f"{name} ({corp_code})" if name else corp_code
-    report_name = _REPORT_NAMES.get(args.report, args.report)
-    print(f"{who}  {args.year} {report_name}  ({label})")
-    picked: dict[str, Row] = {}
+    row_by_account: dict[str, Row] = {}
     for row in rows:
         if row.get("fs_div") != statement_div:
             continue
-        name = _canonical_account(str(row.get("account_nm", "")))
-        if name in _KEY_ACCOUNTS and name not in picked:   # keep the first match only
-            picked[name] = row
+        account_name = _canonical_account(str(row.get("account_nm", "")))
+        if account_name in _KEY_ACCOUNTS and account_name not in row_by_account:
+            row_by_account[account_name] = row   # DART repeats some lines; keep the first
+    if not row_by_account:   # the requested statement (CFS/OFS) has no key accounts
+        print(f"no {statement_div} data", file=sys.stderr)
+        return 1
+    label = "OFS 별도" if args.separate else "CFS 연결"
+    company_name = _company_name(dart, corp_code)
+    who = f"{company_name} ({corp_code})" if company_name else corp_code
+    report_name = _REPORT_NAMES.get(args.report, args.report)
+    print(f"{who}  {args.year} {report_name}  ({label})")
     lines = [
-        (name, _format_amount(picked[name].get("thstrm_amount", "")))
-        for name in _KEY_ACCOUNTS
-        if name in picked
+        (account_name, _format_amount(row_by_account[account_name].get("thstrm_amount", "")))
+        for account_name in _KEY_ACCOUNTS
+        if account_name in row_by_account
     ]
     amount_w = max((len(amount) for _, amount in lines), default=0)
-    for name, amount in lines:
-        print(f"{_pad(name, 12)} {amount:>{amount_w}}")   # right-align the numeric column
+    for account_name, amount in lines:
+        print(f"{_pad(account_name, 12)} {amount:>{amount_w}}")
     return 0
 
 
@@ -183,7 +186,7 @@ def _parser() -> argparse.ArgumentParser:
     finance = subparsers.add_parser("finance")
     finance.add_argument("company")
     finance.add_argument("--year", type=int, default=datetime.date.today().year - 1)
-    finance.add_argument("--report", default="11011")
+    finance.add_argument("--report", choices=tuple(_REPORT_NAMES), default="11011")
     finance.add_argument("--separate", action="store_true")
     finance.add_argument("--json", action="store_true")
     return parser
@@ -202,7 +205,7 @@ def _dispatch(dart: OpenDart, args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Run the OpenDART command-line client."""
+    """Run the CLI on ``argv`` (or ``sys.argv`` when None); return the process exit code."""
     parser = _parser()
     args = parser.parse_args(argv)
     if args.command is None:

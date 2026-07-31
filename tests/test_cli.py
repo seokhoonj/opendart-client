@@ -3,6 +3,8 @@
 import json
 from typing import ClassVar
 
+import pytest
+
 from opendart_client import cli
 
 ROWS = [
@@ -144,3 +146,42 @@ def test_search_limit_and_corp_code_passthrough(monkeypatch, capsys):
 def test_no_subcommand_returns_two(capsys):
     assert cli.main([]) == 2
     assert "usage: opendart" in capsys.readouterr().out
+
+
+class _FinanceReturning:
+    def __init__(self, rows):
+        self._rows = rows
+
+    def single_accounts(self, corp_code, *, fiscal_year, report_code):
+        return self._rows
+
+
+def _dart_with_finance(rows):
+    """A FakeOpenDart whose finance.single_accounts returns `rows`."""
+
+    class _Dart(FakeOpenDart):
+        def __init__(self, api_key=None, *, timeout=30.0):
+            super().__init__(api_key=api_key, timeout=timeout)
+            self.finance = _FinanceReturning(rows)  # type: ignore[assignment]
+
+    return _Dart
+
+
+def test_finance_no_rows_returns_one(monkeypatch, capsys):
+    monkeypatch.setattr(cli, "OpenDart", _dart_with_finance([]))
+    assert cli.main(["--api-key", "x", "finance", "삼성", "--year", "2025"]) == 1
+    assert capsys.readouterr().err.strip() == "no data"
+
+
+def test_finance_missing_statement_returns_one(monkeypatch, capsys):
+    # default view is CFS; a company with only OFS rows must not print an empty success
+    ofs_only = [{"account_nm": "매출액", "fs_div": "OFS", "thstrm_amount": "1"}]
+    monkeypatch.setattr(cli, "OpenDart", _dart_with_finance(ofs_only))
+    assert cli.main(["--api-key", "x", "finance", "삼성", "--year", "2025"]) == 1
+    assert "no CFS data" in capsys.readouterr().err
+
+
+def test_finance_invalid_report_is_rejected(monkeypatch):
+    monkeypatch.setattr(cli, "OpenDart", FakeOpenDart)
+    with pytest.raises(SystemExit):
+        cli.main(["--api-key", "x", "finance", "삼성", "--report", "99999"])

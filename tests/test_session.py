@@ -71,6 +71,23 @@ def test_malformed_config_file_raises(monkeypatch, tmp_path):
         DartSession()
 
 
+def test_non_string_config_key_raises(monkeypatch, tmp_path):
+    monkeypatch.delenv("OPENDART_API_KEY", raising=False)
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    config = tmp_path / "opendart-client" / "credentials.json"
+    config.parent.mkdir()
+    config.write_text(json.dumps({"api_key": None}), encoding="utf-8")
+    with pytest.raises(ValueError, match="must be a string"):
+        DartSession()
+
+
+def test_whitespace_key_falls_through_to_next_source(monkeypatch, tmp_path):
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+    monkeypatch.setenv("OPENDART_API_KEY", "FROMENV")
+    # a whitespace-only constructor arg must not mask the valid env key
+    assert DartSession(api_key="   ").api_key == "FROMENV"
+
+
 def test_endpoint_url_and_guide():
     assert FLAT.url == "https://opendart.fss.or.kr/api/list.json"
     assert "apiGrpCd=DS001" in FLAT.guide_url and "apiId=2019001" in FLAT.guide_url
