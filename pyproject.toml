@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opendart-client"
-version = "0.1.0"
+version = "0.2.0"
 description = "A clean, sync, typed Python client for Korea's OpenDART (전자공시) disclosure API."
 readme = "README.md"
 requires-python = ">=3.11"
