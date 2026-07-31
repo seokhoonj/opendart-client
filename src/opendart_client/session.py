@@ -59,7 +59,12 @@ def _key_from_config_file() -> str:
 
 
 class DartSession:
-    """Holds the API key; fetches endpoints as raw Python data."""
+    """Holds the API key and fetches endpoints as raw Python data.
+
+    The key comes from ``api_key``, then ``$OPENDART_API_KEY``, then the config file
+    ``~/.config/opendart-client/credentials.json``; construction raises ``ValueError``
+    when none of them supplies one.
+    """
 
     def __init__(self, api_key: str | None = None, *, timeout: float = 30.0) -> None:
         # strip each source before falling through, so a whitespace-only higher-precedence

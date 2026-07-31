@@ -233,7 +233,7 @@ opendart finance 삼성전자 --year 2024        # 주요계정 요약 (매출·
 | `--begin YYYYMMDD` / `--end YYYYMMDD` | `search` | 공시 접수일 구간 |
 | `--limit N` | `search` | 표시 줄 수, 기본 `20` |
 | `--all` | `search` | 첫 페이지만이 아니라 전체 페이지 조회 |
-| `--year N` | `finance` | 사업연도, 기본 직전 연도 |
+| `--year N` | `finance` | 사업연도, 기본은 최근 제출된 사업연도 |
 | `--report CODE` | `finance` | `11011` 사업 · `11012` 반기 · `11013` 1분기 · `11014` 3분기 (기본 `11011`) |
 | `--separate` | `finance` | 별도재무제표(OFS), 기본은 연결(CFS) |
 

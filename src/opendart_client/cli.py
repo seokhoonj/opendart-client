@@ -162,6 +162,13 @@ def _run_finance(dart: OpenDart, args: argparse.Namespace) -> int:
     return 0
 
 
+def _default_year() -> int:
+    """Most recent fiscal year likely to have a filed annual report: last year, except in
+    Q1 (before annual reports are filed) fall back one more year."""
+    today = datetime.date.today()
+    return today.year - (2 if today.month < 4 else 1)
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="opendart")
     parser.add_argument("--api-key")
@@ -189,7 +196,7 @@ def _parser() -> argparse.ArgumentParser:
 
     finance = subparsers.add_parser("finance")
     finance.add_argument("company")
-    finance.add_argument("--year", type=int, default=datetime.date.today().year - 1)
+    finance.add_argument("--year", type=int, default=_default_year())
     finance.add_argument("--report", choices=tuple(_REPORT_NAMES), default="11011")
     finance.add_argument("--separate", action="store_true")
     finance.add_argument("--json", action="store_true")

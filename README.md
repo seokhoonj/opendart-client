@@ -237,7 +237,7 @@ Main options:
 | `--begin YYYYMMDD` / `--end YYYYMMDD` | `search` | filing-date window |
 | `--limit N` | `search` | rows to show, default `20` |
 | `--all` | `search` | fetch every page, not just the first |
-| `--year N` | `finance` | fiscal year, default last year |
+| `--year N` | `finance` | fiscal year, default the most recently filed year |
 | `--report CODE` | `finance` | `11011` annual · `11012` half-year · `11013` Q1 · `11014` Q3 (default `11011`) |
 | `--separate` | `finance` | separate statements (OFS), default consolidated (CFS) |
 

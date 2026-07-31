@@ -1,5 +1,6 @@
 """Command-line tests with a fully offline fake client."""
 
+import datetime
 import json
 from typing import ClassVar
 
@@ -185,3 +186,23 @@ def test_finance_invalid_report_is_rejected(monkeypatch):
     monkeypatch.setattr(cli, "OpenDart", FakeOpenDart)
     with pytest.raises(SystemExit):
         cli.main(["--api-key", "x", "finance", "삼성", "--report", "99999"])
+
+
+def test_default_year_backs_off_in_q1(monkeypatch):
+    class _Q1(datetime.date):
+        @classmethod
+        def today(cls):
+            return cls(2027, 2, 15)
+
+    monkeypatch.setattr(datetime, "date", _Q1)
+    assert cli._default_year() == 2025   # Q1: the 2026 annual report is not filed yet
+
+
+def test_default_year_is_last_year_after_q1(monkeypatch):
+    class _Q2(datetime.date):
+        @classmethod
+        def today(cls):
+            return cls(2027, 6, 15)
+
+    monkeypatch.setattr(datetime, "date", _Q2)
+    assert cli._default_year() == 2026
