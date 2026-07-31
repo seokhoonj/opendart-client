@@ -167,6 +167,16 @@ def test_fetch_groups_non_dict_rows_raises():
         _session(body).fetch_groups(GROUPED)
 
 
+def test_fetch_groups_non_list_group_raises():
+    with pytest.raises(DartError, match="'group' is not a list"):
+        _session({"status": "000", "group": {}}).fetch_groups(GROUPED)
+
+
+def test_fetch_groups_non_dict_entry_raises():
+    with pytest.raises(DartError, match="not an object"):
+        _session({"status": "000", "group": ["oops"]}).fetch_groups(GROUPED)
+
+
 def test_required_param_rejected_before_any_http():
     called = {"hit": False}
     session = DartSession(api_key="TESTKEY")

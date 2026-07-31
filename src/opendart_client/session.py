@@ -92,7 +92,8 @@ class DartSession:
     ) -> list[dict[str, Any]]:
         """A flat endpoint's ``list`` array. status 000 -> the rows; 013 -> ``[]``;
         any other status -> DartError. A 000 body without a ``list`` key raises (it is
-        almost certainly a grouped endpoint that should use ``fetch_groups``)."""
+        almost certainly a grouped endpoint that should use ``fetch_groups``); a ``list``
+        that is not an array of objects also raises ``DartError``."""
         self._require_shape(endpoint, "flat")
         body = self._body(endpoint, params)
         if body is None:
@@ -114,7 +115,9 @@ class DartSession:
     ) -> dict[str, list[dict[str, Any]]]:
         """A grouped endpoint's ``group[].list[]``, keyed by each group's title.
         status 000 -> the groups; 013 -> ``{}``; other -> DartError. A 000 body
-        without a ``group`` key raises (a flat endpoint should use ``fetch_list``)."""
+        without a ``group`` key raises (a flat endpoint should use ``fetch_list``); a
+        malformed ``group`` (not a list, a non-object entry, or a nested ``list`` that is
+        not an array of objects) also raises ``DartError``."""
         self._require_shape(endpoint, "grouped")
         body = self._body(endpoint, params)
         if body is None:
