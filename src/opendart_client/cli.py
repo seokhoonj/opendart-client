@@ -7,6 +7,7 @@ import datetime
 import json
 import sys
 import unicodedata
+from collections.abc import Callable
 from typing import Any
 
 from .client import OpenDart
@@ -165,11 +166,12 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="opendart")
     parser.add_argument("--api-key")
     parser.add_argument("--timeout", type=float, default=30.0)
-    subparsers = parser.add_subparsers(dest="command")
+    subparsers = parser.add_subparsers()
 
     resolve = subparsers.add_parser("resolve")
     resolve.add_argument("query")
     resolve.add_argument("--json", action="store_true")
+    resolve.set_defaults(handler=_run_resolve)
 
     search = subparsers.add_parser("search")
     search.add_argument("company")
@@ -178,10 +180,12 @@ def _parser() -> argparse.ArgumentParser:
     search.add_argument("--limit", type=int, default=20)
     search.add_argument("--all", action="store_true")
     search.add_argument("--json", action="store_true")
+    search.set_defaults(handler=_run_search)
 
     company = subparsers.add_parser("company")
     company.add_argument("company")
     company.add_argument("--json", action="store_true")
+    company.set_defaults(handler=_run_company)
 
     finance = subparsers.add_parser("finance")
     finance.add_argument("company")
@@ -189,31 +193,23 @@ def _parser() -> argparse.ArgumentParser:
     finance.add_argument("--report", choices=tuple(_REPORT_NAMES), default="11011")
     finance.add_argument("--separate", action="store_true")
     finance.add_argument("--json", action="store_true")
+    finance.set_defaults(handler=_run_finance)
     return parser
-
-
-def _dispatch(dart: OpenDart, args: argparse.Namespace) -> int:
-    if args.command == "resolve":
-        return _run_resolve(dart, args)
-    if args.command == "search":
-        return _run_search(dart, args)
-    if args.command == "company":
-        return _run_company(dart, args)
-    if args.command == "finance":
-        return _run_finance(dart, args)
-    raise ValueError(f"unknown command: {args.command}")
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the CLI on ``argv`` (or ``sys.argv`` when None); return the process exit code."""
     parser = _parser()
     args = parser.parse_args(argv)
-    if args.command is None:
+    handler: Callable[[OpenDart, argparse.Namespace], int] | None = getattr(
+        args, "handler", None
+    )
+    if handler is None:   # no subcommand given
         parser.print_help()
         return 2
     try:
         dart = OpenDart(api_key=args.api_key, timeout=args.timeout)
-        return _dispatch(dart, args)
+        return handler(dart, args)
     except (ValueError, DartError) as err:
         print(f"error: {err}", file=sys.stderr)
         return 1
