@@ -227,9 +227,23 @@ opendart company 삼성전자                    # company profile
 opendart finance 삼성전자 --year 2024        # key accounts (revenue, operating & net income, assets/liabilities/equity)
 ```
 
+Main options:
+
+| Option | Commands | What it does |
+|---|---|---|
+| `--api-key KEY` | all | pass the key directly (else the env var / config file) |
+| `--timeout SEC` | all | per-request timeout in seconds, default `30` |
+| `--json` | all | print the full result as JSON instead of the readable summary |
+| `--begin YYYYMMDD` / `--end YYYYMMDD` | `search` | filing-date window |
+| `--limit N` | `search` | rows to show, default `20` |
+| `--all` | `search` | fetch every page, not just the first |
+| `--year N` | `finance` | fiscal year, default last year |
+| `--report CODE` | `finance` | `11011` annual · `11012` half-year · `11013` Q1 · `11014` Q3 (default `11011`) |
+| `--separate` | `finance` | separate statements (OFS), default consolidated (CFS) |
+
 The `<company>` argument takes a name, ticker, initials, typo, or an 8-digit corp_code
 — it resolves to a corp_code internally. Each command prints a readable summary by
-default; `--json` prints the full result. See `--help` for options.
+default; `--json` prints the full result. See `--help` for the rest.
 
 `resolve` lists corp_code, ticker, then name; an unlisted company shows `------` for
 the ticker.
