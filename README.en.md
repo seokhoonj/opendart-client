@@ -69,10 +69,13 @@ typo (`dart.resolver().resolve(...)`). A query with no matching data comes back 
 Returns are `list[dict]`, so pandas / polars build a DataFrame directly.
 
 ```python
+# pandas
 import pandas as pd
-import polars as pl
+pd.DataFrame(rows)
 
-pd.DataFrame(rows)   # or pl.DataFrame(rows)
+# polars
+import polars as pl
+pl.DataFrame(rows)
 ```
 
 ## 3. API

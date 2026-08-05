@@ -66,10 +66,13 @@ dart.event.paid_in_capital_increase(
 반환은 `list[dict]`이라 pandas·polars 표(DataFrame)로 바로 만들 수 있습니다.
 
 ```python
+# pandas
 import pandas as pd
-import polars as pl
+pd.DataFrame(rows)
 
-pd.DataFrame(rows)   # 또는 pl.DataFrame(rows)
+# polars
+import polars as pl
+pl.DataFrame(rows)
 ```
 
 ## 3. API
