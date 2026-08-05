@@ -293,8 +293,11 @@ codex plugin add opendart@opendart-client
 없이 `/resolve`처럼 부르면 됩니다:
 
 ```sh
-ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
+ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve   # Claude Code → /resolve
+ln -s "$PWD/plugins/opendart/skills/resolve" ~/.codex/skills/resolve    # Codex → $opendart:resolve
 ```
+
+Claude Code는 바로 인식하고, Codex는 재시작해야 로딩됩니다.
 
 ## 6. 라이선스
 

@@ -299,8 +299,11 @@ Prefer not to install the plugin? Symlink a skill into your skills directory and
 without the `opendart:` prefix, as `/resolve`:
 
 ```sh
-ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve
+ln -s "$PWD/plugins/opendart/skills/resolve" ~/.claude/skills/resolve   # Claude Code -> /resolve
+ln -s "$PWD/plugins/opendart/skills/resolve" ~/.codex/skills/resolve    # Codex -> $opendart:resolve
 ```
+
+Claude Code picks it up immediately; Codex needs a restart to load it.
 
 ## 6. License
 
