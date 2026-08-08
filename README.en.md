@@ -280,6 +280,8 @@ command. Install the package and set an API key first (above).
 
 ### 5.1. Claude Code
 
+In the Claude Code chat, add the marketplace and install:
+
 ```
 /plugin marketplace add seokhoonj/opendart-client
 /plugin install opendart@opendart-client
@@ -289,6 +291,8 @@ Then just ask ("find Samsung Electronics' corp_code", "show 삼성전자's recen
 or call a skill directly — `/opendart:resolve 삼성전자`, `/opendart:finance 삼성전자 --year 2024`.
 
 ### 5.2. Codex
+
+In your terminal, add the marketplace and install:
 
 ```
 codex plugin marketplace add seokhoonj/opendart-client

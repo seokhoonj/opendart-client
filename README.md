@@ -274,6 +274,8 @@ $ opendart finance 삼성전자 --year 2024
 
 ### 5.1. Claude Code
 
+Claude Code 채팅창에서 마켓플레이스를 추가하고 설치합니다:
+
 ```
 /plugin marketplace add seokhoonj/opendart-client
 /plugin install opendart@opendart-client
@@ -283,6 +285,8 @@ $ opendart finance 삼성전자 --year 2024
 스킬을 직접 호출하세요 — `/opendart:resolve 삼성전자`, `/opendart:finance 삼성전자 --year 2024`.
 
 ### 5.2. Codex
+
+터미널에서 마켓플레이스를 추가하고 설치합니다:
 
 ```
 codex plugin marketplace add seokhoonj/opendart-client
